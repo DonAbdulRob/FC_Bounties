@@ -1,0 +1,9 @@
+name: FC_Bounties
+main: me.Destro168.FC_Bounties.FC_Bounties
+version: 2.3
+description: Allows for player bounties to be set.
+commands:
+   bounty:
+      description: This is the general bounty command.
+      usage: Check the bukkit dev page for permission information.
+depend: [FC_Suite_Shared]

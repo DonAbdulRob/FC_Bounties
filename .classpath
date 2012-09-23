@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/craftbukkit-0.0.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/plugins/Vault.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/plugins/WorldEdit.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/plugins/WorldGuard.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/plugins/FC_Suite_Shared.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
