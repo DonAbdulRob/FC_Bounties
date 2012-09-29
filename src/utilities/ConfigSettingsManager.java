@@ -31,11 +31,9 @@ public class ConfigSettingsManager
 	public void setBlockCommands(boolean x) {  }
 	public void setAnnouncePlayerBountyCreation(boolean x) { config = plugin.getConfig(); config.set("Setting.announcePlayerBountyCreation", x); plugin.saveConfig(); }
 	public void setBountyIntervalLength(int x) { config = plugin.getConfig(); config.set("Setting.bountyIntervalLength", x); plugin.saveConfig(); }
-	
 	public void setTierBaseMultiplier(int tier, int multi) { config = plugin.getConfig(); config.set("Setting.tier" + tier + "BaseMultiplier", multi); plugin.saveConfig(); }
 	public void setTierBaseBonus(int tier, int multi) { config = plugin.getConfig(); config.set("Setting.tier" + tier + "BaseBonus", multi); plugin.saveConfig(); }
 	public void setTierLength(int tier, int length) { config = plugin.getConfig(); config.set("Setting.tier" + tier + "Length", length); plugin.saveConfig(); }
-	
 	public void setRequiredPlayers(int x) { config = plugin.getConfig(); config.set("Setting.requiredPlayers", x); plugin.saveConfig(); }
 	public void setSurvivalBonusAmount(int x) { config = plugin.getConfig(); config.set("Setting.survivalBonusAmount", x); plugin.saveConfig(); }
 	public void setKillerBonusAmount(int x) { config = plugin.getConfig(); config.set("Setting.killerBonusAmount", x); plugin.saveConfig(); }
@@ -51,6 +49,7 @@ public class ConfigSettingsManager
 	public void setIgnorePlayerExemptionSetting(boolean x) { config = plugin.getConfig(); config.set("Setting.ignorePlayerExemptionSetting", x); plugin.saveConfig(); }
 	public void setIgnoreWorlds(List<String> x) { config = plugin.getConfig(); config.set("Setting.ignoreWorlds", x); plugin.saveConfig(); }
 	public void setEnableIgnoreWorlds(boolean x) { config = plugin.getConfig(); config.set("Setting.enableIgnoreWorlds", x); plugin.saveConfig(); }
+	public void setBountyCreationTaxPercent(double x) { config = plugin.getConfig(); config.set("Setting.bountyCreationTaxPercent", x); plugin.saveConfig(); }
 	
 	public double getVersion() 
 	{
@@ -72,11 +71,9 @@ public class ConfigSettingsManager
 	public boolean getBlockCommands() { config = plugin.getConfig(); return config.getBoolean("Setting.blockCommands"); }
 	public boolean getAnnouncePlayerBountyCreation() { config = plugin.getConfig(); return config.getBoolean("Setting.announcePlayerBountyCreation"); }
 	public int getBountyIntervalLength() { config = plugin.getConfig(); return config.getInt("Setting.bountyIntervalLength"); }
-	
 	public int getTierBaseMultiplier(int tier) { config = plugin.getConfig(); return config.getInt("Setting.tier" + tier + "BaseMultiplier"); }
 	public int getTierBaseBonus(int tier) { config = plugin.getConfig(); return config.getInt("Setting.tier" + tier + "BaseBonus"); }
 	public int getTierLength(int tier) { config = plugin.getConfig(); return config.getInt("Setting.tier" + tier + "Length"); }
-	
 	public int getRequiredPlayers() { config = plugin.getConfig(); return config.getInt("Setting.requiredPlayers"); }
 	public int getSurvivalBonusAmount() { config = plugin.getConfig(); return config.getInt("Setting.survivalBonusAmount"); }
 	public int getKillerBonusAmount() { config = plugin.getConfig(); return config.getInt("Setting.killerBonusAmount"); }
@@ -92,6 +89,7 @@ public class ConfigSettingsManager
 	public boolean getIgnorePlayerExemptionSetting() { config = plugin.getConfig(); return config.getBoolean("Setting.ignorePlayerExemptionSetting"); }
 	public boolean getEnableIgnoreWorlds() { config = plugin.getConfig(); return config.getBoolean("Setting.enableIgnoreWorlds"); }
 	public List<String> getIgnoreWorlds() { config = plugin.getConfig(); return config.getStringList("Setting.ignoreWorlds"); }
+	public double getBountyCreationTaxPercent() { config = plugin.getConfig(); return config.getDouble("Setting.bountyCreationTaxPercent"); }
 	
 	public ConfigSettingsManager()
 	{
@@ -247,6 +245,15 @@ public class ConfigSettingsManager
 				
 				pm.transferPlayerData2();
 			}
+		}
+		
+		if (getVersion() < 2.31)
+		{
+			//Update version
+			setVersion(2.31);
+			
+			//Set new setting.
+			setBountyCreationTaxPercent(5);
 		}
 	}
 }

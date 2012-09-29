@@ -58,6 +58,7 @@ public class BountiesCE implements CommandExecutor
 		final int range = 15;
 		int playerBountyCount = 0;
 		int count = 0;
+		double bountyCost;
 		
 		if (args.equals(""))
 		{
@@ -103,8 +104,11 @@ public class BountiesCE implements CommandExecutor
 				cont = false;
 			}
 			
+			//Set how much the bounty cost is based on the tax percent.
+			bountyCost = intArgs[2] + intArgs[2] * csm.getBountyCreationTaxPercent() * .01;
+			
 			//Only let players make the bounty if they can afford it.
-			difference = economy.getBalance(playerSender.getName()) - intArgs[2];
+			difference = economy.getBalance(playerSender.getName()) - bountyCost;
 			
 			if (difference < 0)
 			{
@@ -127,7 +131,7 @@ public class BountiesCE implements CommandExecutor
 				bountyHandler.addNewBounty(playerSender.getName(), args[1], intArgs[2], none);
 				
 				//Charge money
-				economy.withdrawPlayer(playerSender.getName(), intArgs[2]);
+				economy.withdrawPlayer(playerSender.getName(), bountyCost);
 				
 				if (csm.getAnnouncePlayerBountyCreation())
 				{
