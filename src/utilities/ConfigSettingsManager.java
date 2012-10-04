@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.Destro168.FC_Bounties.FC_Bounties;
-import me.Destro168.FC_Bounties.PlayerManager;
-
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class ConfigSettingsManager
@@ -50,6 +46,9 @@ public class ConfigSettingsManager
 	public void setIgnoreWorlds(List<String> x) { config = plugin.getConfig(); config.set("Setting.ignoreWorlds", x); plugin.saveConfig(); }
 	public void setEnableIgnoreWorlds(boolean x) { config = plugin.getConfig(); config.set("Setting.enableIgnoreWorlds", x); plugin.saveConfig(); }
 	public void setBountyCreationTaxPercent(double x) { config = plugin.getConfig(); config.set("Setting.bountyCreationTaxPercent", x); plugin.saveConfig(); }
+	public void setBountyStealPercent(double x) { config = plugin.getConfig(); config.set("Setting.bountyStealPercent", x); plugin.saveConfig(); }
+	public void setBountyDeathPercent(double x) { config = plugin.getConfig(); config.set("Setting.bountyDeathPercent", x); plugin.saveConfig(); }
+	public void setEnableMoneyLogging(boolean x) { config = plugin.getConfig(); config.set("Setting.enableMoneyLogging", x); plugin.saveConfig(); }
 	
 	public double getVersion() 
 	{
@@ -90,6 +89,9 @@ public class ConfigSettingsManager
 	public boolean getEnableIgnoreWorlds() { config = plugin.getConfig(); return config.getBoolean("Setting.enableIgnoreWorlds"); }
 	public List<String> getIgnoreWorlds() { config = plugin.getConfig(); return config.getStringList("Setting.ignoreWorlds"); }
 	public double getBountyCreationTaxPercent() { config = plugin.getConfig(); return config.getDouble("Setting.bountyCreationTaxPercent"); }
+	public double getBountyStealPercent() { config = plugin.getConfig(); return config.getDouble("Setting.bountyStealPercent"); }
+	public double getBountyDeathPercent() { config = plugin.getConfig(); return config.getDouble("Setting.bountyDeathPercent"); }
+	public boolean getEnableMoneyLogging() { config = plugin.getConfig(); return config.getBoolean("Setting.enableMoneyLogging"); }
 	
 	public ConfigSettingsManager()
 	{
@@ -99,9 +101,11 @@ public class ConfigSettingsManager
 	public void handleConfiguration()
 	{
 		//Load settings from configuration file.
-		if (getVersion() < 1)
+		if (getVersion() < 2.31)
 		{
-			setVersion(1.0);
+			//Set the version.
+			setVersion(2.31);
+			
 			setInvulnerabilityEnabled(true);
 			setEnableCreatorName(true);
 			setEnablePlayerTargetName(true);
@@ -131,129 +135,39 @@ public class ConfigSettingsManager
 			setTimeBeforeDrop(300000);
 			setLastBounty("");
 			setBlockedCommandUseCost(1000);
-		}
-		
-		if (getVersion() < 1.14)
-		{
-			setVersion(1.14);
 			setSurvivalBonusPercent(0);
 			setKillerBonusPercent(0);
-		}
-		
-		if (getVersion() < 1.17)
-		{
-			//Update Configuration file version/new settings.
-			setVersion(1.17);
 			setAnnouncePlayerBountyCreation(true);
-			
-			//Delete old settings
-			config.set("Setting.startupTries", null);
-			config.set("Setting.playersCanExempt", null);
-			config.set("Setting.playersCanDrop", null);
-		}
-		
-		if (getVersion() < 1.18)
-		{
-			setVersion(1.18);
-			
-			//Delete leaderboard for new leaderboard code to take effect.
-			config.set("Leaderboard", null);
-		}
-		
-		if (getVersion() < 2.1)
-		{
-			setVersion(2.1);
-			
-			//Transfer all player data over.
-			PlayerManager pm;
-			
-			for (OfflinePlayer player : Bukkit.getOfflinePlayers())
-			{
-				pm = new PlayerManager(player.getName());
-				
-				pm.transferPlayerData();
-			}
-			
-			config = plugin.getConfig();
-			
-			//Remove old data.
-			config.set("Player", null);
-			
-			plugin.saveConfig();
-		}
-		
-		if (getVersion() < 2.23)
-		{
-			//Set new version
-			setVersion(2.23);
-			
-			//New Ignore Exemption Setting command.
 			setIgnorePlayerExemptionSetting(true);
-			
-			//Enable the ignore worlds.
 			setEnableIgnoreWorlds(true);
 			
-			//Add a new creative world.
 			List<String> ignoreWorlds = new ArrayList<String>();
 			ignoreWorlds.add("creative");
 			setIgnoreWorlds(ignoreWorlds);
-		}
-		
-		if (getVersion() < 2.24)
-		{
-			//Set new version
-			setVersion(2.24);
 			
 			//Set bounty base.
 			setGeneratedBountyBase(25);
-		}
-		
-		if (getVersion() < 2.25)
-		{
-			//Set new version
-			setVersion(2.25);
 			
 			//Set the new tier base bonuses.
 			setTierBaseBonus(0,10);
 			setTierBaseBonus(1,20);
 			setTierBaseBonus(2,30);
 			setTierBaseBonus(3,40);
-		}
-		
-		if (getVersion() < 2.27)
-		{
-			//Set new version
-			setVersion(2.27);
-			
+
 			//Restore player target name option.
 			setEnableServerTargetName(true);
 			
-			config = plugin.getConfig(); config.set("Setting.blockCommands", null); plugin.saveConfig();
-		}
-		
-		if (getVersion() < 2.3)
-		{
-			//Update version
-			setVersion(2.3);
-			
-			//Transfer all player data over into new format.
-			PlayerManager pm;
-			
-			for (OfflinePlayer player : Bukkit.getOfflinePlayers())
-			{
-				pm = new PlayerManager(player.getName());
-				
-				pm.transferPlayerData2();
-			}
-		}
-		
-		if (getVersion() < 2.31)
-		{
-			//Update version
-			setVersion(2.31);
-			
 			//Set new setting.
 			setBountyCreationTaxPercent(5);
+		}
+		
+		if (getVersion() < 3.0)
+		{
+			setVersion(3.0);
+
+			setBountyStealPercent(0);
+			setBountyDeathPercent(0);
+			setEnableMoneyLogging(true);
 		}
 	}
 }

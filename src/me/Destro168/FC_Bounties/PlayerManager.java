@@ -1,14 +1,12 @@
 package me.Destro168.FC_Bounties;
 
-import me.Destro168.ConfigManagers.SharedPlayerProfileManager;
-
-import org.bukkit.configuration.file.FileConfiguration;
+import me.Destro168.ConfigManagers.CustomConfigurationManager;
 
 public class PlayerManager
 {
 	private String playerPath;
 	private String name;
-	private SharedPlayerProfileManager profile;
+	private CustomConfigurationManager profile;
 	
 	public void setCreated(boolean x) { profile.set(playerPath + "created",x); }
 	public void setExempt(boolean x) { profile.set(playerPath + "exempt",x); }
@@ -29,43 +27,7 @@ public class PlayerManager
 		playerPath = "FC_Bounties.";
 		
 		//New shared player profile
-		profile = new SharedPlayerProfileManager(name, FC_Bounties.plugin.getDataFolder().getAbsolutePath());
-		
-	}
-	
-	//Handle transfer of everything from FC_Suite_Shared folder to seperate folders.
-	public void transferPlayerData2()
-	{
-		SharedPlayerProfileManager oldProfile =  new SharedPlayerProfileManager(name, "");
-		
-		//Update old player data to new format.
-		setCreated(oldProfile.getBoolean(playerPath + "created"));
-		setExempt(oldProfile.getBoolean(playerPath + "exempt"));
-		setKills(oldProfile.getInt(playerPath + "kills"));
-		setSurvives(oldProfile.getInt(playerPath + "survives"));
-		
-		//Update old player data to new format.
-		oldProfile.set("FC_Bounties",null);
-	}
-	
-	public void transferPlayerData()
-	{
-		//Variable Declarations
-		FileConfiguration config = FC_Bounties.plugin.getConfig();
-		String oldPlayerPath = "Player." + name + ".";
-		
-		if (config.getString(oldPlayerPath + "created") == null)
-			return;
-		
-		if (config.getString(oldPlayerPath + "created").equals(""))
-			return;
-		
-		profile.set("FC_Bounties.created", config.getInt(oldPlayerPath + "created"));
-		profile.set("FC_Bounties.exempt", config.getInt(oldPlayerPath + "exempt"));
-		profile.set("FC_Bounties.kills", config.getBoolean(oldPlayerPath + "kills"));
-		profile.set("FC_Bounties.survives", config.getBoolean(oldPlayerPath + "survives"));
-		
-		FC_Bounties.plugin.saveConfig();
+		profile = new CustomConfigurationManager(FC_Bounties.plugin.getDataFolder().getAbsolutePath(), name);
 	}
 	
 	public void checkPlayerData()

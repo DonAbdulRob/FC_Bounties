@@ -20,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.Plugin;
 
 import utilities.ConfigSettingsManager;
+import utilities.LogFile;
 
 public class FC_Bounties extends JavaPlugin
 {
@@ -30,6 +31,7 @@ public class FC_Bounties extends JavaPlugin
     
 	public static FC_Bounties plugin;
     public static Economy economy = null;
+    public static LogFile logFile;
 	public static int[] tid = new int[3];
 	public static int playerEntries = 50000;
 	public static int MAX_BOUNTIES = 5000;
@@ -57,6 +59,7 @@ public class FC_Bounties extends JavaPlugin
 		//Handle variable assignments
 		bountyHandler = new BountyManager();
 		csm = new ConfigSettingsManager();
+		logFile = new LogFile(FC_Bounties.plugin.getDataFolder().getAbsolutePath());
 		
 		//Update the configuration file.
 		csm.handleConfiguration();
@@ -127,6 +130,10 @@ public class FC_Bounties extends JavaPlugin
 						msgLib.standardMessage("Finally, you have to see this giant wall of text. Who wants to see this? I mean common, just don't use commands!");
 						
 						economy.withdrawPlayer(event.getPlayer().getName(), cost);
+						
+						if (csm.getEnableMoneyLogging() == true)
+							plugin.getLogger().info("[Command With SB] Withdrawing: " + event.getPlayer().getName() + " / Amount: " + cost);
+						
 						event.setCancelled(true);
 					}
 				}

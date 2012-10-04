@@ -1,3 +1,30 @@
+Version 3.0:
+
+This version upgrade to 3.0 features a few good changes that should really help bring things in line. Sorry that the installation isn't automatic, you will have to do a few things. As always I recommend backing up your features in case anything goes wrong so that you can report the issue to me and if needed I can fix it.
+
+- All support for previous versions is completely being dropped. That means that if you have a version pre-2.31, then you will need to run 2.31, and then follow the upcoming steps in order to successfully run 3.0. Or you can start from scratch at 3.0, your call. The main things I did was remove the player file transfering code due to it's clunkiness. As well, I removed the code that would upgrade things to past versions, check past sources if interested. Plugin configs will update to 2.31 but player file data won't.
+
+- FC_Suite_Shared now has it's own changelog that can be viewed. It's kind of pointless for me to describe major changes to all plugins 3 times so I will just link it all there, way more organized :)
+
+- I seperated out the userinfo file, the information for that can be viewed in the FC_Shared_Suite changelog. Bounties are now also stored in a new file located at ~/plugins/Fc_bounties/bounties.yml. Please move your bounties from the config file into that file as well. Or, alternatively load up 3.0, create a bounty and the file will appear, and then copy your bounties into the new 
+
+Alright so that wraps up all the installation information for this version, if you do all of that properly then congratulations! Now everything is seperated out in a way that should "never" need changed again. I don't want to be all like "I stole what Essentials did" but my format is pretty similar and since Essentials is pretty boss at the way they have their stuff organized, I can't see myself needing to reorganize again. Sorry for the work!
+
+- Randomly generated server bounties will now show the target of the player bounty if the server bounty target name configuration option is enabled.
+- Adjusted wording for broadcasts and fixed capitalization. Announcements have caps on the first letter of words now.
+- Added 3 new configuration options for stealing and losing money on death. As well, there is a new money logging option, check configuration setup page for information.
+- It is possible now to have both a flat, AND percent amount for bounties that will be rewarded on kills/survivals.
+- I guess bonus percent wasn't coded, my bad on that. Had wrong name, nobody reported though but found in code, it's fixed now.
+- Just recoded pretty much all of the bounty killing and rewarding stuff for more optimization.
+- Players can no longer put bounties on themselves.
+- Removed the all keyword for /bounty list. It was clunky, took a bit longer than I expected but I think that the command "feels" 9 billion% better without the all keyword needed.
+- Bounties will now show the total worth of a player when they are created.
+- Able to use bounty commands from console now. Console is all-powerful, can put bounties on anything, has infinite money, can destroy the universe, etc. etc. ALL HAIL!
+- All money is formatted properly now. (TODO).
+- Tax percent is now displayed in /bounty.
+- Upgraded logging for money transactions to now be in a seperate file upon request of Chalkie. I think it looks good too.
+- Heavily modified the list command some more so that now it displays better. The colors are good, and it always shows up to 15 (skips numbers). Way better looking and usable now.
+
 Version 2.31:
 
 * By popular request, added in new bounty tax percent. Sorry it took so long, literally took like 20 seconds to code. xD

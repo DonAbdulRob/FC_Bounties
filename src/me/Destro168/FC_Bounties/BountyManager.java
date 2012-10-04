@@ -1,17 +1,18 @@
 package me.Destro168.FC_Bounties;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 import me.Destro168.ConfigManagers.ConfigManager;
+import me.Destro168.ConfigManagers.CustomConfigurationManager;
 import me.Destro168.Messaging.BroadcastLib;
 import me.Destro168.Messaging.MessageLib;
 import me.Destro168.Messaging.StringFormatter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import utilities.ConfigSettingsManager;
@@ -20,40 +21,42 @@ import utilities.FC_BountiesPermissions;
 public class BountyManager
 {
 	private FC_Bounties plugin;
-	private FileConfiguration config;
-	ConfigSettingsManager csm = new ConfigSettingsManager();
-	BroadcastLib bLib = new BroadcastLib();
-	ConfigManager cm = new ConfigManager();
+	private CustomConfigurationManager ccm;
+	private ConfigSettingsManager csm = new ConfigSettingsManager();
+	private BroadcastLib bLib = new BroadcastLib();
+	private ConfigManager cm = new ConfigManager();
 	
-	public void setCreator(int x, String y) { config = plugin.getConfig(); config.set("Bounty" + x + ".creator", y); plugin.saveConfig(); }
-	public void setTarget(int x, String y) { config = plugin.getConfig(); config.set("Bounty" + x + ".target", y); plugin.saveConfig(); }
-	public void setActive(int x, boolean y) { config = plugin.getConfig(); config.set("Bounty" + x + ".active", y); plugin.saveConfig(); }
-	public void setAmount(int x, int y) { config = plugin.getConfig(); config.set("Bounty" + x + ".amount", y); plugin.saveConfig(); }
-	public void setDate(int x, long l) { config = plugin.getConfig(); config.set("Bounty" + x + ".date", l); plugin.saveConfig(); }
+	public void setCreator(int x, String y) { ccm.set("Bounty" + x + ".creator", y); }
+	public void setTarget(int x, String y) { ccm.set("Bounty" + x + ".target", y); }
+	public void setActive(int x, boolean y) { ccm.set("Bounty" + x + ".active", y); }
+	public void setAmount(int x, int y) { ccm.set("Bounty" + x + ".amount", y); }
+	public void setDate(int x, long l) { ccm.set("Bounty" + x + ".date", l); }
 	
-	public void setPosX(int x, int y) { config = plugin.getConfig(); config.set("Bounty" + x + ".posX", y); plugin.saveConfig(); }
-	public void setPosY(int x, int y) { config = plugin.getConfig(); config.set("Bounty" + x + ".posY", y); plugin.saveConfig(); }
-	public void setPosZ(int x, int y) { config = plugin.getConfig(); config.set("Bounty" + x + ".posZ", y); plugin.saveConfig(); }
-	public void setTier(int x, int y) { config = plugin.getConfig(); config.set("Bounty" + x + ".tier", y); plugin.saveConfig(); }
+	public void setPosX(int x, int y) { ccm.set("Bounty" + x + ".posX", y); plugin.saveConfig(); }
+	public void setPosY(int x, int y) { ccm.set("Bounty" + x + ".posY", y); plugin.saveConfig(); }
+	public void setPosZ(int x, int y) { ccm.set("Bounty" + x + ".posZ", y); plugin.saveConfig(); }
+	public void setTier(int x, int y) { ccm.set("Bounty" + x + ".tier", y); plugin.saveConfig(); }
 	
-	public String getCreator(int x) { config = plugin.getConfig(); return config.getString("Bounty" + x + ".creator"); }
-	public String getTarget(int x) { config = plugin.getConfig(); return config.getString("Bounty" + x + ".target"); }
-	public boolean getActive(int x) { config = plugin.getConfig(); return config.getBoolean("Bounty" + x + ".active"); }
-	public int getAmount(int x) { config = plugin.getConfig(); return config.getInt("Bounty" + x + ".amount"); }
-	public long getDate(int x) { config = plugin.getConfig(); return config.getLong("Bounty" + x + ".date"); }
+	public String getCreator(int x) { return ccm.getString("Bounty" + x + ".creator"); }
+	public String getTarget(int x) { return ccm.getString("Bounty" + x + ".target"); }
+	public boolean getActive(int x) { return ccm.getBoolean("Bounty" + x + ".active"); }
+	public int getAmount(int x) { return ccm.getInt("Bounty" + x + ".amount"); }
+	public long getDate(int x) { return ccm.getLong("Bounty" + x + ".date"); }
 	
-	public int getPosX(int x) { config = plugin.getConfig(); return config.getInt("Bounty" + x + ".posX"); }
-	public int getPosY(int x) { config = plugin.getConfig(); return config.getInt("Bounty" + x + ".posY"); }
-	public int getPosZ(int x) { config = plugin.getConfig(); return config.getInt("Bounty" + x + ".posZ"); }
-	public int getTier(int x) { config = plugin.getConfig(); return config.getInt("Bounty" + x + ".tier"); }
+	public int getPosX(int x) { return ccm.getInt("Bounty" + x + ".posX"); }
+	public int getPosY(int x) { return ccm.getInt("Bounty" + x + ".posY"); }
+	public int getPosZ(int x) { return ccm.getInt("Bounty" + x + ".posZ"); }
+	public int getTier(int x) { return ccm.getInt("Bounty" + x + ".tier"); }
 	
 	//Non-get/sets
-	public void deleteBounty(int removeNumber) { config.set("Bounty" + String.valueOf(removeNumber), null); plugin.saveConfig(); }
+	public void deleteBounty(int removeNumber) { ccm.set("Bounty" + String.valueOf(removeNumber), null); }
 	
 	//Empty constructor
 	public BountyManager()
 	{
+		//Assign key variables.
 		plugin = FC_Bounties.plugin;
+		ccm = new CustomConfigurationManager(plugin.getDataFolder().getAbsolutePath(), "%BountySpecialCode%");
 	}
 	
 	public int addNewBounty(String creator, String target, int amount, Location loc)
@@ -128,7 +131,7 @@ public class BountyManager
 		return newID;
 	}
 	
-	public String getInformation(int i, int contentLevel, String standardMessageColor)
+	public List<String> getInformation(int i, int contentLevel, String standardMessageColor)
 	{
 		StringFormatter sf = new StringFormatter();
 		Random rand = new Random();
@@ -137,21 +140,24 @@ public class BountyManager
 		int y;
 		int z;
 		
-		String message = "";
+		List<String> message = new ArrayList<String>();
 		
 		if (contentLevel == 1)
 		{	
 			if (csm.getEnableCreatorName())
 			{
-				message = message + "[Creator]: " + getCreator(i) + " ";
+				message.add("[C]: ");
+				message.add(getCreator(i) + " ");
 			}
 			
 			if (csm.getEnablePlayerTargetName())
 			{
-				message = message + "[Target]: " + getTarget(i) + " ";
+				message.add("[T]: ");
+				message.add(getTarget(i) + " ");
 			}
 			
-			message = message + "[Reward]: " + sf.getFormattedMoney(getAmount(i), standardMessageColor);
+			message.add("[R]: ");
+			message.add(sf.getFormattedMoney(getAmount(i), standardMessageColor));
 			
 			if (csm.getEnablePlayerCoordinates() == true)
 			{
@@ -170,17 +176,26 @@ public class BountyManager
 					z = z + rand.nextInt(offset);
 				}
 				
-				message = message + "[X]: " + String.valueOf(x) + " [Y]: " + String.valueOf(y) + " [Z]: " + String.valueOf(z);
+				message.add("[X]: ");
+				message.add(String.valueOf(x) + " ");
+				
+				message.add("[Y]: ");
+				message.add(String.valueOf(y) + " ");
+				
+				message.add("[Z]: ");
+				message.add(String.valueOf(z));
 			}
 		}
 		else if (contentLevel == 2)
 		{
 			if (csm.getEnableServerTargetName())
 			{
-				message = message + "[Target]: " + getTarget(i) + " ";
+				message.add("[T]: ");
+				message.add(getTarget(i) + " ");
 			}
 			
-			message = message + "[Reward]: " + sf.getFormattedMoney(getAmount(i), standardMessageColor) + " ";
+			message.add("[R]: ");
+			message.add(sf.getFormattedMoney(getAmount(i), standardMessageColor) + " ");
 			
 			if (csm.getEnableServerCoordinates() == true)
 			{
@@ -199,7 +214,14 @@ public class BountyManager
 					z = z + rand.nextInt(offset);
 				}
 				
-				message = message + "[X]: " + String.valueOf(x) + " [Y]: " + String.valueOf(y) + " [Z]: " + String.valueOf(z);
+				message.add("[X]: ");
+				message.add(String.valueOf(x) + " ");
+				
+				message.add("[Y]: ");
+				message.add(String.valueOf(y) + " ");
+				
+				message.add("[Z]: ");
+				message.add(String.valueOf(z));
 			}
 		}
 		
@@ -342,7 +364,7 @@ public class BountyManager
 				{
 					if (csm.getIgnoreWorlds().contains(target.getWorld()))
 					{
-						bLib.standardBroadcast("The server bounty target went to a forbidden world! Server bounty dropped.");
+						bLib.standardBroadcast("The Server Bounty Target Went To A Blocked World. The Server Bounty Has Been Dropped.");
 						deleteBounty(serverBounty);
 						return;
 					}
@@ -395,7 +417,7 @@ public class BountyManager
 				if (target.isOnline() == true)
 				{
 					msgLib = new MessageLib(target);
-					msgLib.standardMessage("Warning! There aren't enough players online so the bounty was dropped.");
+					msgLib.standardMessage("Warning, The Server Bounty Has Been Dropped Due To Insufficient Online Players.");
 					deleteBounty(getServerBountyID());
 				}
 			}
@@ -479,7 +501,8 @@ public class BountyManager
 	{
 		StringFormatter sf = new StringFormatter();
 		int serverBountyID = getServerBountyID();
-		int amount;
+		int amount = 0;
+		String playerString = "";
 		
 		//If the server bounty id is -1, we return.
 		if (serverBountyID == -1)
@@ -491,7 +514,13 @@ public class BountyManager
 		setAmount(serverBountyID, amount);
 		
 		if (getTier(serverBountyID) == x - 1)
-			bLib.standardBroadcast("The server bounty has increased a tier! It is now worth: " + sf.getFormattedMoney(amount, cm.secondaryColor) + "!");
+		{
+			//If the plyaer name is enabled, then we want to display it.
+			if (csm.getEnableServerTargetName())
+				playerString = getTarget(serverBountyID);
+			
+			bLib.standardBroadcast("The Server Bounty Tier " + playerString + " Has Increased! New Value: " + sf.getFormattedMoney(amount, cm.secondaryColor) + "!");
+		}
 		
 		setTier(serverBountyID, getTier(serverBountyID) + 1);
 	}
@@ -506,21 +535,31 @@ public class BountyManager
 		//Count total players online.
 		for (Player player: Bukkit.getServer().getOnlinePlayers())
 		{
-			playerManager = new PlayerManager(player.getName());
-			
-			playerManager.checkPlayerData();
-			
 			perms = new FC_BountiesPermissions(player);
 			
 			if (ignoreExempt == true)
 			{
-				if (perms.isUntargetable() == false)
-					count = count + 1;
+				if (perms.permissionsEnabled() == true)
+				{
+					if (perms.isUntargetable() == false)
+						count = count + 1;
+				}
 			}
 			else
 			{
-				if (perms.isUntargetable() == false && playerManager.getExempt() == false)
-					count = count + 1;
+				playerManager = new PlayerManager(player.getName());
+				playerManager.checkPlayerData();
+
+				if (perms.permissionsEnabled() == true)
+				{
+					if (perms.isUntargetable() == false && playerManager.getExempt() == false)
+						count = count + 1;
+				}
+				else
+				{
+					if (playerManager.getExempt() == false)
+						count = count + 1;
+				}
 			}
 		}
 		
@@ -572,42 +611,64 @@ public class BountyManager
 	
 	public void rewardBountyKill(Player killer, String killedName, double amount, int bountyID)
 	{
+		//Variable Declarations
 		TopKillersBoard tkb = new TopKillersBoard();
 		String name = killer.getName();
 		PlayerManager playerManager = new PlayerManager(name);
+		String broadcastString = name + " Has Killed " + killedName + " To Win " + bLib.getFormattedMoney(amount, cm.secondaryColor);
 		double percentAmount;
 		
+		//If the current bounty is the server bounty, then...
 		if (bountyID == getServerBountyID())
 		{
+			//If there is a flat amount of money to reward, calculate it and announce.
 			if (csm.getKillerBonusAmount() > 0)
 			{
-				bLib.standardBroadcast(name + " has killed " + killedName + " to win " + bLib.getFormattedMoney(amount, cm.secondaryColor) + " and the kill bonus of $" + csm.getKillerBonusAmount() + "!");
+				broadcastString = broadcastString + " And The Kill Bonus Of $" + csm.getKillerBonusAmount();
 				
 				//Add configurable bonus
 				amount = amount + csm.getKillerBonusAmount();
 			}
-			//Create a percent amount if the survival bonus isn't a flat amount.
-			else if (csm.getKillerBonusAmount() > 0) 
+			
+			//If there is a percent amount to reward, calculate it and announce.
+			if (csm.getKillerBonusPercent() > 0) 
 			{
-				percentAmount =  amount / csm.getKillerBonusAmount();
+				percentAmount = getPercent(amount, csm.getKillerBonusPercent());
 				
-				bLib.standardBroadcast(name + " has killed " + killedName + " to win " + bLib.getFormattedMoney(amount, cm.secondaryColor) + " and the kill bonus of $" + String.valueOf(percentAmount) + "!");
+				broadcastString = broadcastString + " And The Kill Bonus Of $" + String.valueOf(percentAmount);
 				
 				//Add configurable bonus
 				amount = amount + percentAmount;
 			}
-			else
-			{
-				bLib.standardBroadcast(name + " has killed " + killedName + " to win " + bLib.getFormattedMoney(amount, cm.secondaryColor) + "!");
-			}
-		}
-		else
-		{
-			bLib.standardBroadcast(name + " has killed " + killedName + " to win " + bLib.getFormattedMoney(amount, cm.secondaryColor) + "!");
 		}
 		
-		//Log the event
-		plugin.getLogger().info("Killer: " + name + " won amount: " + amount);
+		//Broadcast the message.
+		bLib.standardBroadcast(broadcastString + "!");
+		
+		if (csm.getBountyDeathPercent() > 0)
+		{
+			percentAmount = getPercent(csm.getBountyDeathPercent(), FC_Bounties.economy.getBalance(killedName));
+			
+			FC_Bounties.economy.withdrawPlayer(killedName, percentAmount);
+			
+			FC_Bounties.logFile.logMoneyTransaction("[Death %] Withdrawing: " + killedName + " / Amount: " + percentAmount);
+		}
+		
+		if (csm.getBountyStealPercent() > 0)
+		{
+			percentAmount = getPercent(csm.getBountyStealPercent(), FC_Bounties.economy.getBalance(killedName));
+			
+			FC_Bounties.economy.withdrawPlayer(killedName, percentAmount);
+			FC_Bounties.economy.depositPlayer(killer.getName(), percentAmount);
+			
+			if (csm.getEnableMoneyLogging() == true)
+			{
+				FC_Bounties.logFile.logMoneyTransaction("[Steal %] Withdrawing: " + killedName + " / Amount: " + percentAmount);
+				FC_Bounties.logFile.logMoneyTransaction("[Steal %] Depositing: " + killer.getName() + " / Amount: " + percentAmount);
+			}
+		}
+		
+		FC_Bounties.logFile.logMoneyTransaction("[Bounty Kill Reward] Depositing: " + name + " / Amount: " + amount);
 		
 		//Give the player the reward
 		FC_Bounties.economy.depositPlayer(name, amount);
@@ -634,31 +695,30 @@ public class BountyManager
 		String name = winner.getName();
 		PlayerManager playerManager = new PlayerManager(name);
 		double percentAmount;
+		String broadcastString = name + " Has Survived To Win " + bLib.getFormattedMoney(amount, cm.secondaryColor);
 		
 		if (csm.getSurvivalBonusAmount() > 0)
 		{
-			bLib.standardBroadcast(name + " has survived to win " + bLib.getFormattedMoney(amount, cm.secondaryColor) + " and the survival bonus of $" + csm.getSurvivalBonusAmount() + "!");
+			broadcastString = broadcastString + " And The Survival Bonus Of $" + csm.getSurvivalBonusAmount();
 			
-			//Add survival bonus
+			//Add survival flat bonus
 			amount = amount + csm.getSurvivalBonusAmount();
 		}
 		//Create a percent amount if the survival bonus isn't a flat amount.
-		else if (csm.getSurvivalBonusPercent() > 0)
+		if (csm.getSurvivalBonusPercent() > 0)
 		{
-			percentAmount =  amount / csm.getSurvivalBonusPercent();
+			percentAmount = getPercent(csm.getSurvivalBonusPercent(),amount);
 			
-			bLib.standardBroadcast(name + " has survived to win " + bLib.getFormattedMoney(amount, cm.secondaryColor) + " and the survival bonus of $" + String.valueOf(percentAmount) + "!");
+			broadcastString = broadcastString + " And The Survival Bonus Of $" + String.valueOf(percentAmount);
 			
-			//Add percent bonus.
+			//Add survival percent bonus.
 			amount = amount + percentAmount;
 		}
-		else
-		{
-			bLib.standardBroadcast(name + " has survived to win " + bLib.getFormattedMoney(amount, cm.secondaryColor) + "!");
-		}
+		
+		bLib.standardBroadcast(broadcastString + "!");
 		
 		//Log the event
-		plugin.getLogger().info("Survivor: " + name + " won amount: " + bLib.getFormattedMoney(amount, cm.secondaryColor));
+		FC_Bounties.logFile.logMoneyTransaction("[Survivor Reward] Depositing: " + name + " / Amount: " + bLib.getFormattedMoney(amount, cm.secondaryColor));
 		
 		//Give the player the reward
 		FC_Bounties.economy.depositPlayer(name, amount);
@@ -677,6 +737,34 @@ public class BountyManager
 		
 		//Try to generate another bounty.
 		manageServerBounty();
+	}
+	
+	public double getPlayerWorth(String name)
+	{
+		double totalWorth = 0;
+		
+		for (int i = 0; i < FC_Bounties.MAX_BOUNTIES; i++)
+		{
+			if (getTarget(i) != null)
+			{
+				if (getTarget(i).equals(name))
+				{
+					totalWorth += getAmount(i);
+				}
+			}
+		}
+		
+		return totalWorth;
+	}
+	
+	//Returns x% of y.
+	private double getPercent(double x, double y)
+	{
+		double percentAmount;
+		
+		percentAmount = x * y * .01;
+		
+		return percentAmount;
 	}
 }
 

@@ -11,6 +11,11 @@ public class FC_BountiesPermissions extends PermissionManager
 		super(player);
 	}
 	
+	public FC_BountiesPermissions(boolean isConsole)
+	{
+		super(isConsole);
+	}
+	
 	public boolean isAdmin()
 	{
 		if (isGlobalAdmin() == true)
@@ -19,7 +24,7 @@ public class FC_BountiesPermissions extends PermissionManager
 		if (permission.has(player, "FC_Bounties.admin"))
 			return true;
 		
-		return false;
+		return isConsole;
 	}
 	
 	public boolean isUntargetable()
@@ -27,7 +32,7 @@ public class FC_BountiesPermissions extends PermissionManager
 		if (permission.has(player, "FC_Bounties.unTargetable"))
 			return true;
 		
-		return false;
+		return isConsole;
 	}
 	
 	public boolean commandCreate()
@@ -38,7 +43,7 @@ public class FC_BountiesPermissions extends PermissionManager
 		if (permission.has(player, "FC_Bounties.command.create"))
 			return true;
 		
-		return false;
+		return isConsole;
 	}
 	
 	public boolean commandRemove()
@@ -49,7 +54,7 @@ public class FC_BountiesPermissions extends PermissionManager
 		if (permission.has(player, "FC_Bounties.command.remove"))
 			return true;
 		
-		return false;
+		return isConsole;
 	}
 	
 	public boolean commandList()
@@ -60,7 +65,7 @@ public class FC_BountiesPermissions extends PermissionManager
 		if (permission.has(player, "FC_Bounties.command.list"))
 			return true;
 		
-		return false;
+		return isConsole;
 	}
 	
 	public boolean commandDrop()
@@ -71,7 +76,7 @@ public class FC_BountiesPermissions extends PermissionManager
 		if (permission.has(player, "FC_Bounties.command.drop"))
 			return true;
 		
-		return false;
+		return isConsole;
 	}
 	
 	public boolean commandExempt()
@@ -82,7 +87,7 @@ public class FC_BountiesPermissions extends PermissionManager
 		if (permission.has(player, "FC_Bounties.command.exempt"))
 			return true;
 		
-		return false;
+		return isConsole;
 	}
 	
 	public boolean commandTop()
@@ -93,7 +98,7 @@ public class FC_BountiesPermissions extends PermissionManager
 		if (permission.has(player, "FC_Bounties.command.top"))
 			return true;
 		
-		return false;
+		return isConsole;
 	}
 }
 

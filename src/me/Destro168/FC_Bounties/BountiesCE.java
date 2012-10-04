@@ -1,5 +1,6 @@
 package me.Destro168.FC_Bounties;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.command.ColouredConsoleSender;
 import org.bukkit.entity.Player;
 
 import utilities.ConfigSettingsManager;
@@ -20,14 +22,20 @@ import utilities.FC_BountiesPermissions;
 
 public class BountiesCE implements CommandExecutor
 {
+	private final int bountyDisplayCap = 15;
+	
 	private static Economy economy = null;
 	
-	BountyManager bountyHandler;
-	Player playerSender;
-	ConfigSettingsManager csm = new ConfigSettingsManager();
-	MessageLib msgLib;
-	PlayerManager playerManager;
-	FC_BountiesPermissions perms;
+	private BountyManager bountyHandler;
+	private ColouredConsoleSender console;
+	private Player player;
+	private String senderName;
+	
+	private ConfigSettingsManager csm = new ConfigSettingsManager();
+	private MessageLib msgLib;
+	private PlayerManager playerManager;
+	private FC_BountiesPermissions perms;
+	private ConfigManager cm;
 	
 	public BountiesCE(BountyManager bountyHandler_, Economy economy_) 
 	{
@@ -38,13 +46,9 @@ public class BountiesCE implements CommandExecutor
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args2)
     {
-		playerSender = (Player) sender;
-		perms = new FC_BountiesPermissions(playerSender);
-		playerManager = new PlayerManager(playerSender.getName());
-		
+		//Assign key variables based on command input and arguments.
 		ArgParser fap = new ArgParser(args2);
-		msgLib = new MessageLib(playerSender);
-		ConfigManager cm = new ConfigManager();
+		cm = new ConfigManager();
 		
 		Date now;
 		String removeMessage;
@@ -55,10 +59,30 @@ public class BountiesCE implements CommandExecutor
 		boolean isExempt = false;
 		boolean cont = true;
 		long timeDifference;
-		final int range = 15;
 		int playerBountyCount = 0;
 		int count = 0;
 		double bountyCost;
+		
+		if (sender instanceof Player)
+		{
+			player = (Player) sender;
+			perms = new FC_BountiesPermissions(player);
+			msgLib = new MessageLib(player);
+			senderName = player.getName();
+			playerManager = new PlayerManager(senderName);
+		}
+		else if (sender instanceof ColouredConsoleSender)
+		{
+			console = (ColouredConsoleSender) sender;
+			perms = new FC_BountiesPermissions(true);
+			msgLib = new MessageLib(console);
+			senderName = "[Console]";
+		}
+		else
+		{
+			FC_Bounties.plugin.getLogger().info("Unknown command sender, returning ban command.");
+			return false;
+		}
 		
 		if (args.equals(""))
 		{
@@ -81,79 +105,90 @@ public class BountiesCE implements CommandExecutor
 				return msgLib.errorInvalidCommand();
 			}
 			
-			//We count how many bounties a player has.
-			for (int i = 0; i < FC_Bounties.MAX_BOUNTIES; i++)
+			if (console == null)
 			{
-				if (bountyHandler.getCreator(i) != null)
+				//We count how many bounties a player has.
+				for (int i = 0; i < FC_Bounties.MAX_BOUNTIES; i++)
 				{
-					if (bountyHandler.getCreator(i).equals(playerSender.getName()))
-						playerBountyCount++;
+					if (bountyHandler.getCreator(i) != null)
+					{
+						if (bountyHandler.getCreator(i).equals(senderName))
+							playerBountyCount++;
+					}
 				}
 			}
+			
 			
 			if (playerBountyCount > csm.getMaximumBountiesPerPlayer())
 			{
 				msgLib.standardMessage("You have already created 20 bounties. You must remove old bounties or wait for them to expire.");
-				cont = false;
+				return true;
 			}
 			
 			//Ensure the bounty entered is greater or equal to the minimum bounty value.
 			if (intArgs[2] < csm.getMinimumBountyValue())
 			{
 				msgLib.standardMessage("You must ceate bounties worth $" + csm.getMinimumBountyValue() + " or more.");
-				cont = false;
+				return true;
 			}
 			
 			//Set how much the bounty cost is based on the tax percent.
 			bountyCost = intArgs[2] + intArgs[2] * csm.getBountyCreationTaxPercent() * .01;
 			
 			//Only let players make the bounty if they can afford it.
-			difference = economy.getBalance(playerSender.getName()) - bountyCost;
-			
-			if (difference < 0)
-			{
-				msgLib.standardMessage("You can't afford to create a bounty with that reward.");
-				cont = false;
-			}
-			
-			if (args[1].equals("[SERVER]"))
-			{
-				msgLib.standardMessage("[SERVER] is reserved and not a player name.");
-				cont = false;
-			}
-			
-			if (cont == true)
+			if (console != null)
 			{
 				//Create empty location
-				Location none = new Location(playerSender.getWorld(), 0,0,0);
+				Location none = new Location(Bukkit.getWorlds().get(0), 0,0,0);
 				
 				//Create the new bounty.
-				bountyHandler.addNewBounty(playerSender.getName(), args[1], intArgs[2], none);
+				bountyHandler.addNewBounty(senderName, args[1], intArgs[2], none);
 				
-				//Charge money
-				economy.withdrawPlayer(playerSender.getName(), bountyCost);
+				String broadcast = "Created A Bounty To Kill " + args[1] + " With A Reward Of: " + msgLib.getFormattedMoney(intArgs[2], cm.secondaryColor) +
+						". " + args[1] + " Is Now Worth A Total Of " + msgLib.getFormattedMoney(bountyHandler.getPlayerWorth(args[1]), cm.secondaryColor);
 				
 				if (csm.getAnnouncePlayerBountyCreation())
-				{
-					msgLib.standardBroadcast(playerSender.getName() + " created bounty to kill " + args[1] + " for " + msgLib.getFormattedMoney(intArgs[2], cm.primaryColor));
-				}
+					msgLib.standardBroadcast(senderName + " Has " + broadcast);
 				else
-				{
-					try
-					{
-						msgLib.standardMessage("Created bounty to kill " + bountyHandler.getTarget(intArgs[1]) + " for " + "$" + intArgs[2]);
-					}
-					catch (NumberFormatException e)
-					{
-						return msgLib.errorInvalidCommand();
-					}
-				}
+					msgLib.standardMessage("Successfully " + broadcast);
+				
+				FC_Bounties.logFile.logMoneyTransaction("[Bounty Create] Withdraw: " + senderName + " | Amount: " + bountyCost + " | Target: " + args[1]);
 				
 				return msgLib.successCommand();
 			}
 			else
 			{
-				return true;
+				difference = economy.getBalance(senderName) - bountyCost;
+				
+				if (difference < 0)
+					msgLib.standardMessage("You can't afford to create a bounty with that reward.");
+				if (args[1].equals("[SERVER]"))
+					msgLib.standardMessage("[SERVER] is reserved and not a player name.");
+				else if (args[1].equals(senderName))
+					msgLib.standardMessage("Sorry but you can't put bounties on yourself.");
+				else
+				{
+					//Create empty location
+					Location none = new Location(player.getWorld(), 0,0,0);
+					
+					//Create the new bounty.
+					bountyHandler.addNewBounty(senderName, args[1], intArgs[2], none);
+					
+					String broadcast = " Created A Bounty To Kill " + args[1] + " With A Reward Of: " + msgLib.getFormattedMoney(intArgs[2], cm.secondaryColor) +
+							". " + args[1] + " Is Now Worth A Total Of " + msgLib.getFormattedMoney(bountyHandler.getPlayerWorth(args[1]), cm.secondaryColor);
+					
+					//Charge money
+					economy.withdrawPlayer(senderName, bountyCost);
+					
+					if (csm.getAnnouncePlayerBountyCreation())
+						msgLib.standardBroadcast(senderName + " Has " + broadcast);
+					else
+						msgLib.standardMessage("Successfully " + broadcast);
+					
+					FC_Bounties.logFile.logMoneyTransaction("[Bounty Create] Withdraw: " + senderName + " | Amount: " + bountyCost + " | Target: " + args[1]);
+					
+					return msgLib.successCommand();
+				}
 			}
 		}
 		
@@ -179,29 +214,49 @@ public class BountiesCE implements CommandExecutor
 			//Make sure the enter a bounty to remove in a valid range.
 			if (intArgs[1] > -1 && intArgs[1] <= FC_Bounties.MAX_BOUNTIES)
 			{
-				//Set the remove message
-				removeMessage = "The bounty for " + bountyHandler.getTarget(intArgs[1]) + " has been removed and refunded.";
+				//Variable declaration to store bounty target.
+				String bountyTarget = bountyHandler.getTarget(intArgs[1]);
 				
-				//If the player is the creator or they are an admin
-				if (playerSender.getName().equalsIgnoreCase(bountyHandler.getCreator(intArgs[1])) || perms.isAdmin())
+				if (bountyTarget == null)
 				{
-					//Refund money
-					economy.bankDeposit(playerSender.getName(), bountyHandler.getAmount(intArgs[1]));
-					
+					msgLib.standardMessage("There is no bounty to remove at the index specified.");
+					return true;
+				}
+				
+				//Set the remove message
+				removeMessage = "The bounty for " + bountyTarget + " has been removed and refunded.";
+				
+				//Console can delete bounties at will. ALL HAIL!
+				if (console != null)
+				{
 					//Delete the bounty.
 					bountyHandler.deleteBounty(intArgs[1]);
 				}
 				else
 				{
-					msgLib.standardMessage("You can't remove this bounty because you did not create it!");
-					return false;
+					//If the player is the creator or they are an admin
+					if (senderName.equalsIgnoreCase(bountyHandler.getCreator(intArgs[1])) || perms.isAdmin())
+					{
+						//Refund money
+						economy.bankDeposit(senderName, bountyHandler.getAmount(intArgs[1]));
+						
+						FC_Bounties.logFile.logMoneyTransaction("[Bounty Remove] Depositing: " + senderName + " | Amount: " + bountyHandler.getAmount(intArgs[1]) + " | Target: " + bountyHandler.getTarget(intArgs[1]));
+						
+						//Delete the bounty.
+						bountyHandler.deleteBounty(intArgs[1]);
+					}
+					else
+					{
+						msgLib.standardMessage("You can't remove this bounty because you did not create it!");
+						return false;
+					}
 				}
 				
 				//Display the bounty is removed if you announce bounty creation.
 				if (csm.getAnnouncePlayerBountyCreation() == true)
 					msgLib.standardBroadcast(removeMessage);
 				else
-					playerSender.sendMessage(removeMessage);
+					msgLib.standardMessage(removeMessage);
 				
 				return true;
 			}
@@ -214,9 +269,12 @@ public class BountiesCE implements CommandExecutor
 		
 		else if (args[0].equalsIgnoreCase("list"))
 		{
+			boolean hasOne = false;
+			
 			if (perms.commandList() == false)
 				return msgLib.errorNoPermission();
 			
+			//Check if the 3rd argument is empty or not.
 			if (args[2].equals(""))
 			{
 				args[2] = "0";
@@ -224,16 +282,14 @@ public class BountiesCE implements CommandExecutor
 				cont = true;
 			}
 			
-			try
-			{
-				intArgs[2] = Integer.valueOf(args[2]);
-			}
-			catch (NumberFormatException e)
-			{
-				intArgs[2] = 0;
-			}
+			//Attempt to convert strings to integers.
+			try { intArgs[1] = Integer.valueOf(args[1]); }
+			catch (NumberFormatException e) { intArgs[1] = -1; }
 			
-			if (intArgs[2] > -1 && intArgs[2] < FC_Bounties.MAX_BOUNTIES - range)
+			try { intArgs[2] = Integer.valueOf(args[2]); }
+			catch (NumberFormatException e) { intArgs[2] = 0; }
+			
+			if (intArgs[2] > -1 && intArgs[2] < FC_Bounties.MAX_BOUNTIES - bountyDisplayCap)
 			{
 				cont = true;
 			}
@@ -246,60 +302,22 @@ public class BountiesCE implements CommandExecutor
 				
 			if (cont == true)
 			{
-				if (fap.getArg(1).equalsIgnoreCase("all") || fap.getArg(1).equals(""))
-				{
-					msgLib.standardHeader("Listing all bounties: ");
-					
-					for (int i = intArgs[2]; i < intArgs[2] + range; i++)
-					{
-						if (bountyHandler.getActive(i) == true)
-						{
-							if (!(bountyHandler.getCreator(i).equalsIgnoreCase("[SERVER]")))
-							{
-								msgLib.standardMessage(String.valueOf(i) + ": " + bountyHandler.getInformation(i,1,cm.primaryColor));
-								count++;
-							}
-							else
-							{
-								msgLib.standardMessage(String.valueOf(i) + ": [Server Bounty]: " + bountyHandler.getInformation(i,2,cm.primaryColor));
-								
-								if (perms.isAdmin())
-									msgLib.standardMessage("Current Server Bounty Target: " + bountyHandler.getTarget(bountyHandler.getServerBountyID()));
-								
-								count++;
-							}
-						}
-					}
-				}
-				else if (fap.getArg(1).equalsIgnoreCase("mine"))
-				{
-					msgLib.standardMessage("Listing your bounties: ");
-					
-					for (int i = intArgs[2]; i < intArgs[2] + range; i++)
-					{
-						if (bountyHandler.getActive(i) == true)
-						{
-							if (bountyHandler.getCreator(i) == playerSender.getName())
-							{
-								msgLib.standardMessage(String.valueOf(i) + ": " + bountyHandler.getInformation(i,1,cm.primaryColor));
-								count++;
-							}
-						}
-					}
-				}
+				msgLib.standardMessage("Listing your bounties: ");
+				
+				if (fap.getArg(1).equalsIgnoreCase("mine"))
+					hasOne = listBounties(intArgs[2], true);
+				
+				else if (intArgs[1] > -1)
+					hasOne = listBounties(intArgs[1], false);
+				
 				else
-				{
-					cont = false;
-					return msgLib.errorInvalidCommand();
-				}
+					hasOne = listBounties(0, false);
 			}
 			
 			if (cont == true)
 			{
-				if (count == 0)
-				{
+				if (hasOne == false)
 					msgLib.standardMessage("This list you requested to view is empty.");
-				}
 				else
 					msgLib.standardMessage("Finished Listing.");
 				
@@ -319,7 +337,7 @@ public class BountiesCE implements CommandExecutor
 				
 				if (timeDifference > csm.getTimeBeforeDrop() || perms.isAdmin())
 				{
-					if (bountyHandler.getTarget(bountyHandler.getServerBountyID()).equalsIgnoreCase(playerSender.getName()))
+					if (bountyHandler.getTarget(bountyHandler.getServerBountyID()).equalsIgnoreCase(senderName))
 					{
 						//Announce they chickened out.
 						msgLib.standardBroadcast("The person with the server bounty chickened out!");
@@ -410,7 +428,7 @@ public class BountiesCE implements CommandExecutor
 				return msgLib.errorNoPermission();
 			
 			sendTopKillersBoard();
-			playerSender.sendMessage("");
+			msgLib.standardMessage("");
 			sendTopSurvivalBoard();
 		}
 		
@@ -517,7 +535,7 @@ public class BountiesCE implements CommandExecutor
 				
 				if (cont == false)
 				{
-					playerSender.sendMessage("You need to enter addition arguments.");
+					msgLib.standardMessage("You need to enter addition arguments.");
 					return true;
 				}
 				else
@@ -577,6 +595,72 @@ public class BountiesCE implements CommandExecutor
 		return true;
 	}
 	
+	private boolean listBounties(int startPoint, boolean listMine)
+	{
+		int alterableLimit = startPoint + bountyDisplayCap;
+		boolean hasOne = false;
+		boolean cont = true;
+		List<String> message = new ArrayList<String>();
+		
+		while (startPoint < alterableLimit)
+		{
+			//Reset cont.
+			cont = false;
+			
+			if (listMine == true)
+			{
+				if (bountyHandler.getActive(startPoint) == true && bountyHandler.getCreator(startPoint) == senderName)
+					cont = true;
+			}
+			else if (bountyHandler.getActive(startPoint) == true)
+			{
+				cont = true;
+			}
+			
+			if (cont == true)
+			{
+				hasOne = true;
+				
+				//Clear out past messages.
+				message.clear();
+				
+				if (!(bountyHandler.getCreator(startPoint).equalsIgnoreCase("[SERVER]")))
+				{
+					message.add(String.valueOf(startPoint) + ": ");
+					
+					for (String part : bountyHandler.getInformation(startPoint,1,cm.primaryColor))
+						message.add(part);
+					
+					msgLib.standardMessage(message);
+				}
+				else
+				{
+					message.add(String.valueOf(startPoint + ": "));
+					message.add("[C]: ");
+					message.add("[Server] ");
+					
+					for (String part : bountyHandler.getInformation(startPoint,2,cm.primaryColor))
+						message.add(part);
+					
+					msgLib.standardMessage(message);
+					
+					if (perms.isAdmin())
+						msgLib.standardMessage("Current Server Bounty Target", bountyHandler.getTarget(bountyHandler.getServerBountyID()));
+				}
+			}
+			else
+			{
+				alterableLimit++;
+				
+				if (alterableLimit > FC_Bounties.MAX_BOUNTIES)
+					break;
+			}
+			
+			startPoint++;
+		}
+		
+		return hasOne;
+	}
 	
 	public boolean messagePlayerHelp(boolean isPage2)
 	{
@@ -589,13 +673,18 @@ public class BountiesCE implements CommandExecutor
 
 			//Begin showing commands if the person has permission to use them.
 			if (perms.commandCreate())
+			{
 				msgLib.standardMessage("/bounty create [name] [reward]","Create a bounty.");
+				
+				if (csm.getBountyCreationTaxPercent() > 0)
+					msgLib.secondaryMessage("Bounty Creation Tax Percent: " + csm.getBountyCreationTaxPercent() + "%");
+			}
 			
 			if (perms.commandRemove())
 				msgLib.standardMessage("/bounty remove [bountyNumber]","Remove a bounty.");
 			
 			if (perms.commandList())
-				msgLib.standardMessage("/bounty list [all,mine] [from starting point]","List bounties");
+				msgLib.standardMessage("/bounty list [<mine>, [Start Point]] <Start Point>","List bounties. The mine keyword will show bounties that you have created only.");
 			
 			if (perms.commandDrop())
 				msgLib.standardMessage("/bounty drop","Removes server bounty from self.");
