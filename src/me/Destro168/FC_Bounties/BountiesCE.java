@@ -7,7 +7,6 @@ import java.util.List;
 import me.Destro168.ConfigManagers.ConfigManager;
 import me.Destro168.FC_Suite_Shared.ArgParser;
 import me.Destro168.Messaging.MessageLib;
-import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,8 +23,6 @@ public class BountiesCE implements CommandExecutor
 {
 	private final int bountyDisplayCap = 15;
 	
-	private static Economy economy = null;
-	
 	private BountyManager bountyHandler;
 	private ColouredConsoleSender console;
 	private Player player;
@@ -37,10 +34,9 @@ public class BountiesCE implements CommandExecutor
 	private FC_BountiesPermissions perms;
 	private ConfigManager cm;
 	
-	public BountiesCE(BountyManager bountyHandler_, Economy economy_) 
+	public BountiesCE(BountyManager bountyHandler_) 
 	{
 		bountyHandler = bountyHandler_;
-		economy = economy_;
 	}
 	
 	@Override
@@ -66,6 +62,7 @@ public class BountiesCE implements CommandExecutor
 		if (sender instanceof Player)
 		{
 			player = (Player) sender;
+			console = null;
 			perms = new FC_BountiesPermissions(player);
 			msgLib = new MessageLib(player);
 			senderName = player.getName();
@@ -73,6 +70,7 @@ public class BountiesCE implements CommandExecutor
 		}
 		else if (sender instanceof ColouredConsoleSender)
 		{
+			player = null;
 			console = (ColouredConsoleSender) sender;
 			perms = new FC_BountiesPermissions(true);
 			msgLib = new MessageLib(console);
@@ -158,7 +156,7 @@ public class BountiesCE implements CommandExecutor
 			}
 			else
 			{
-				difference = economy.getBalance(senderName) - bountyCost;
+				difference = FC_Bounties.economy.getBalance(senderName) - bountyCost;
 				
 				if (difference < 0)
 					msgLib.standardMessage("You can't afford to create a bounty with that reward.");
@@ -178,7 +176,7 @@ public class BountiesCE implements CommandExecutor
 							". " + args[1] + " Is Now Worth A Total Of " + msgLib.getFormattedMoney(bountyHandler.getPlayerWorth(args[1]), cm.secondaryColor);
 					
 					//Charge money
-					economy.withdrawPlayer(senderName, bountyCost);
+					FC_Bounties.economy.withdrawPlayer(senderName, bountyCost);
 					
 					if (csm.getAnnouncePlayerBountyCreation())
 						msgLib.standardBroadcast(senderName + " Has " + broadcast);
@@ -234,11 +232,15 @@ public class BountiesCE implements CommandExecutor
 				}
 				else
 				{
+					//Always return admin money to normal players that create a bounty if the administrator removes the bounty.
+					if (perms.isAdmin() == true)
+						senderName = bountyHandler.getCreator(intArgs[1]);
+					
 					//If the player is the creator or they are an admin
-					if (senderName.equalsIgnoreCase(bountyHandler.getCreator(intArgs[1])) || perms.isAdmin())
+					if (senderName.equalsIgnoreCase(bountyHandler.getCreator(intArgs[1])))
 					{
 						//Refund money
-						economy.bankDeposit(senderName, bountyHandler.getAmount(intArgs[1]));
+						FC_Bounties.economy.depositPlayer(senderName, bountyHandler.getAmount(intArgs[1]));
 						
 						FC_Bounties.logFile.logMoneyTransaction("[Bounty Remove] Depositing: " + senderName + " | Amount: " + bountyHandler.getAmount(intArgs[1]) + " | Target: " + bountyHandler.getTarget(intArgs[1]));
 						

@@ -70,7 +70,7 @@ public class FC_Bounties extends JavaPlugin
 		getServer().getPluginManager().registerEvents(new commandListener(), this);
 		
 		//Add onCommand.
-		myExecutor = new BountiesCE(bountyHandler, economy);
+		myExecutor = new BountiesCE(bountyHandler);
 		getCommand("bounty").setExecutor(myExecutor);
 		
 		//Add listeners.

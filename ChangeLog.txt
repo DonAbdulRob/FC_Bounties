@@ -1,3 +1,6 @@
+Version 3.01 (Unreleased) :
+
+
 Version 3.0:
 
 This version upgrade to 3.0 features a few good changes that should really help bring things in line. Sorry that the installation isn't automatic, you will have to do a few things. As always I recommend backing up your features in case anything goes wrong so that you can report the issue to me and if needed I can fix it.
@@ -20,10 +23,12 @@ Alright so that wraps up all the installation information for this version, if y
 - Removed the all keyword for /bounty list. It was clunky, took a bit longer than I expected but I think that the command "feels" 9 billion% better without the all keyword needed.
 - Bounties will now show the total worth of a player when they are created.
 - Able to use bounty commands from console now. Console is all-powerful, can put bounties on anything, has infinite money, can destroy the universe, etc. etc. ALL HAIL!
-- All money is formatted properly now. (TODO).
+- All money is formatted properly now.
 - Tax percent is now displayed in /bounty.
 - Upgraded logging for money transactions to now be in a seperate file upon request of Chalkie. I think it looks good too.
 - Heavily modified the list command some more so that now it displays better. The colors are good, and it always shows up to 15 (skips numbers). Way better looking and usable now.
+- Fixed critical issue where bounties actually weren't refunding. (should have been fixed in past, my bad. (reason I took down 3.0)
+- Removing bounties not on you using admin or higher permissions will refund the money to the proper person rather than to you. (reason I took down 3.0)
 
 Version 2.31:
 
