@@ -27,7 +27,7 @@ public class PlayerManager
 		playerPath = "FC_Bounties.";
 		
 		//New shared player profile
-		profile = new CustomConfigurationManager(FC_Bounties.plugin.getDataFolder().getAbsolutePath(), name);
+		profile = new CustomConfigurationManager(FC_Bounties.plugin.getDataFolder().getAbsolutePath() + "\\userinfo", name);
 	}
 	
 	public void checkPlayerData()

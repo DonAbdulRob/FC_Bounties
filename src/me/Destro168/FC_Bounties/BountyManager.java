@@ -56,7 +56,7 @@ public class BountyManager
 	{
 		//Assign key variables.
 		plugin = FC_Bounties.plugin;
-		ccm = new CustomConfigurationManager(plugin.getDataFolder().getAbsolutePath(), "%BountySpecialCode%");
+		ccm = new CustomConfigurationManager(plugin.getDataFolder().getAbsolutePath(), "bounties");
 	}
 	
 	public int addNewBounty(String creator, String target, int amount, Location loc)

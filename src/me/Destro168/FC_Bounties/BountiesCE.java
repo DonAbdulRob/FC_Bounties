@@ -142,8 +142,8 @@ public class BountiesCE implements CommandExecutor
 				//Create the new bounty.
 				bountyHandler.addNewBounty(senderName, args[1], intArgs[2], none);
 				
-				String broadcast = "Created A Bounty To Kill " + args[1] + " With A Reward Of: " + msgLib.getFormattedMoney(intArgs[2], cm.secondaryColor) +
-						". " + args[1] + " Is Now Worth A Total Of " + msgLib.getFormattedMoney(bountyHandler.getPlayerWorth(args[1]), cm.secondaryColor);
+				String broadcast = "Created A Bounty To Kill " + args[1] + " With A Reward Of: " + msgLib.getFormattedMoney(intArgs[2], cm.primaryColor) +
+						". " + args[1] + " Is Now Worth A Total Of " + msgLib.getFormattedMoney(bountyHandler.getPlayerWorth(args[1]), cm.primaryColor);
 				
 				if (csm.getAnnouncePlayerBountyCreation())
 					msgLib.standardBroadcast(senderName + " Has " + broadcast);
@@ -172,8 +172,8 @@ public class BountiesCE implements CommandExecutor
 					//Create the new bounty.
 					bountyHandler.addNewBounty(senderName, args[1], intArgs[2], none);
 					
-					String broadcast = " Created A Bounty To Kill " + args[1] + " With A Reward Of: " + msgLib.getFormattedMoney(intArgs[2], cm.secondaryColor) +
-							". " + args[1] + " Is Now Worth A Total Of " + msgLib.getFormattedMoney(bountyHandler.getPlayerWorth(args[1]), cm.secondaryColor);
+					String broadcast = " Created A Bounty To Kill " + args[1] + " With A Reward Of: " + msgLib.getFormattedMoney(intArgs[2], cm.primaryColor) +
+							". " + args[1] + " Is Now Worth A Total Of " + msgLib.getFormattedMoney(bountyHandler.getPlayerWorth(args[1]), cm.primaryColor);
 					
 					//Charge money
 					FC_Bounties.economy.withdrawPlayer(senderName, bountyCost);

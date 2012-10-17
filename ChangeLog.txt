@@ -1,5 +1,7 @@
-Version 3.01 (Unreleased) :
+Version 3.01:
 
+- Built CB release - Build #2377 - CB 1.3.2-R2.0
+- Fixed minor coloring error on bounty creation.
 
 Version 3.0:
 

@@ -169,6 +169,11 @@ public class ConfigSettingsManager
 			setBountyDeathPercent(0);
 			setEnableMoneyLogging(true);
 		}
+		
+		if (getVersion() < 3.01)
+		{
+			setVersion(3.01);
+		}
 	}
 }
 
