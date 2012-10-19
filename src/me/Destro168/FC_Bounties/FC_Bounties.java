@@ -30,7 +30,7 @@ public class FC_Bounties extends JavaPlugin
     int count = 0;
     
 	public static FC_Bounties plugin;
-    public static Economy economy = null;
+    public static Economy economy;
     public static BountyLogFile logFile;
 	public static int[] tid = new int[3];
 	public static int playerEntries = 50000;

@@ -1,3 +1,8 @@
+Version 3.02:
+
+- Fixed minor error with missing space on bounty list.
+- Fixed players being able to create bounties worth infinity. (WOOPS)
+
 Version 3.01:
 
 - Built CB release - Build #2377 - CB 1.3.2-R2.0

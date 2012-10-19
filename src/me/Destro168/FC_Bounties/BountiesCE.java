@@ -160,7 +160,7 @@ public class BountiesCE implements CommandExecutor
 				
 				if (difference < 0)
 					msgLib.standardMessage("You can't afford to create a bounty with that reward.");
-				if (args[1].equals("[SERVER]"))
+				else if (args[1].equals("[SERVER]"))
 					msgLib.standardMessage("[SERVER] is reserved and not a player name.");
 				else if (args[1].equals(senderName))
 					msgLib.standardMessage("Sorry but you can't put bounties on yourself.");

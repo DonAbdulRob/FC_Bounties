@@ -157,7 +157,7 @@ public class BountyManager
 			}
 			
 			message.add("[R]: ");
-			message.add(sf.getFormattedMoney(getAmount(i), standardMessageColor));
+			message.add(sf.getFormattedMoney(getAmount(i), standardMessageColor) + " ");
 			
 			if (csm.getEnablePlayerCoordinates() == true)
 			{
