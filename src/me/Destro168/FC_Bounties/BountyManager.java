@@ -5,11 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import me.Destro168.ConfigManagers.ConfigManager;
 import me.Destro168.ConfigManagers.CustomConfigurationManager;
 import me.Destro168.Messaging.BroadcastLib;
 import me.Destro168.Messaging.MessageLib;
-import me.Destro168.Messaging.StringFormatter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,7 +22,6 @@ public class BountyManager
 	private CustomConfigurationManager ccm;
 	private ConfigSettingsManager csm = new ConfigSettingsManager();
 	private BroadcastLib bLib = new BroadcastLib();
-	private ConfigManager cm = new ConfigManager();
 	
 	public void setCreator(int x, String y) { ccm.set("Bounty" + x + ".creator", y); }
 	public void setTarget(int x, String y) { ccm.set("Bounty" + x + ".target", y); }
@@ -101,39 +98,39 @@ public class BountyManager
 		int newID = 0;
 		MessageLib msgLib = new MessageLib(target);
 		FC_BountiesPermissions perms = new FC_BountiesPermissions(target);
+		String targetName = target.getName();
 		
-		addNewBounty("[SERVER]", target.getName(), csm.getGeneratedBountyBase(), target.getLocation());
+		addNewBounty("[SERVER]", targetName, csm.getGeneratedBountyBase(), target.getLocation());
 		
 		//Broadcast a message.
 		if (csm.getEnableServerTargetName() == true)
-			msgLib.standardBroadcast("A Server Bounty Has Been Created. The Target Is: " + target.getName());
+			msgLib.standardBroadcast("A Server Bounty Has Been Created. The Target Is: &p" + targetName + "&p");
 		else
 			msgLib.standardBroadcast("A Server Bounty Has Been Created.");
 		
 		//Tell all online admins who the server bounty is.
-		msgLib.broadcastToAdmins("New Server Bounty Target: " + getTarget(getServerBountyID()));
+		msgLib.broadcastToAdmins("New Server Bounty Target: &p" + targetName + "&p");
 		
 		//Tell the target they are the server bounty.
 		if (csm.getEnableServerTargetName() == false)
-		msgLib.standardMessage("Congrutalations, You Have Been Picked To Be The Server Bounty Target!");
+			msgLib.standardMessage("Congrutalations, You Have Been Picked To Be The Server Bounty Target!");
 		
 		if (perms.commandDrop())
 		{
 			if (csm.getTimeBeforeDrop() > 0)
-				msgLib.standardMessage("Tip: You Can Drop The Bounty With: /bounty drop after " + csm.getTimeBeforeDrop() * .001 + "seconds.");
+				msgLib.standardMessage("Tip: You Can Drop The Bounty With: /bounty drop after &r" + csm.getTimeBeforeDrop() * .001 + "&r seconds.");
 			else
 				msgLib.standardMessage("Tip: You Can Drop The Bounty With: /bounty drop.");
 		}
 		
 		if (csm.getBlockedCommandUseCost() > 0)
-			msgLib.standardMessage("Tip: Do NOT Use Commands. Each Use Will Cost You " + msgLib.getFormattedMoney(csm.getBlockedCommandUseCost(), cm.primaryColor) + ". This CAN and WILL make your balance go negative.");
+			msgLib.standardMessage("Tip: Do NOT Use Commands. Each Use Will Cost You &q" + csm.getBlockedCommandUseCost() + "&q. This CAN and WILL make your balance go negative.");
 		
 		return newID;
 	}
 	
 	public List<String> getInformation(int i, int contentLevel, String standardMessageColor)
 	{
-		StringFormatter sf = new StringFormatter();
 		Random rand = new Random();
 		int offset;
 		int x;
@@ -157,7 +154,7 @@ public class BountyManager
 			}
 			
 			message.add("[R]: ");
-			message.add(sf.getFormattedMoney(getAmount(i), standardMessageColor) + " ");
+			message.add("&q" + getAmount(i) + "&q");
 			
 			if (csm.getEnablePlayerCoordinates() == true)
 			{
@@ -195,7 +192,7 @@ public class BountyManager
 			}
 			
 			message.add("[R]: ");
-			message.add(sf.getFormattedMoney(getAmount(i), standardMessageColor) + " ");
+			message.add("&q" + getAmount(i) + "&q");
 			
 			if (csm.getEnableServerCoordinates() == true)
 			{
@@ -335,7 +332,7 @@ public class BountyManager
 		if (targetIsOnline == false && serverBounty > -1)
 		{
 			//Announce who chickened out on last server bounty.
-			bLib.standardBroadcast(csm.getLastBounty() + " Chickened Out!");
+			bLib.standardBroadcast("&p" + csm.getLastBounty() + "&p Chickened Out!");
 			
 			//If not online delete the bounty.
 			deleteBounty(serverBounty);
@@ -364,7 +361,7 @@ public class BountyManager
 				{
 					if (csm.getIgnoreWorlds().contains(target.getWorld()))
 					{
-						bLib.standardBroadcast("The Server Bounty Target Went To A Blocked World. The Server Bounty Has Been Dropped.");
+						bLib.standardBroadcast("Warning, The Server Bounty Has Dropped Due To Target Entering Blocked World.");
 						deleteBounty(serverBounty);
 						return;
 					}
@@ -456,8 +453,15 @@ public class BountyManager
 				//Check permissions
 				perms = new FC_BountiesPermissions(player);
 				
-				if (perms.isUntargetable() == true)
+				try
+				{
+					if (perms.isUntargetable() == true)
+						ignorePlayer = true;
+				}
+				catch (NullPointerException e)
+				{
 					ignorePlayer = true;
+				}
 			}
 			
 			//If we aren't ignoring the player, then...
@@ -499,7 +503,6 @@ public class BountyManager
 	
 	public void updateServerBounty(int x)
 	{
-		StringFormatter sf = new StringFormatter();
 		int serverBountyID = getServerBountyID();
 		int amount = 0;
 		String playerString = "";
@@ -508,18 +511,19 @@ public class BountyManager
 		if (serverBountyID == -1)
 			return;
 		
-		//Set the value of the bounty.
+		//Calculate bounty worth.
 		amount = getAmount(serverBountyID) + getPlayerCount() * csm.getTierBaseBonus(x) + csm.getTierBaseBonus(x);
 		
+		//Set the value of the bounty.
 		setAmount(serverBountyID, amount);
 		
 		if (getTier(serverBountyID) == x - 1)
 		{
 			//If the plyaer name is enabled, then we want to display it.
 			if (csm.getEnableServerTargetName())
-				playerString = getTarget(serverBountyID);
+				playerString = " For &p" + getTarget(serverBountyID) + "&p";
 			
-			bLib.standardBroadcast("The Server Bounty Tier " + playerString + " Has Increased! New Value: " + sf.getFormattedMoney(amount, cm.secondaryColor) + "!");
+			bLib.standardBroadcast("The Server Bounty Tier " + String.valueOf(getTier(serverBountyID) + 1) + playerString + " Has Increased! New Value: &q" + amount + "&q!");
 		}
 		
 		setTier(serverBountyID, getTier(serverBountyID) + 1);
@@ -615,7 +619,7 @@ public class BountyManager
 		TopKillersBoard tkb = new TopKillersBoard();
 		String name = killer.getName();
 		PlayerManager playerManager = new PlayerManager(name);
-		String broadcastString = name + " Has Killed " + killedName + " To Win " + bLib.getFormattedMoney(amount, cm.secondaryColor);
+		String broadcastString = "&p" + name + "&p Has Killed &p" + killedName + "&p To Win &q" + amount + "&q";
 		double percentAmount;
 		
 		//If the current bounty is the server bounty, then...
@@ -624,7 +628,7 @@ public class BountyManager
 			//If there is a flat amount of money to reward, calculate it and announce.
 			if (csm.getKillerBonusAmount() > 0)
 			{
-				broadcastString = broadcastString + " And The Kill Bonus Of $" + csm.getKillerBonusAmount();
+				broadcastString = broadcastString + " And The Kill Bonus Of &q" + csm.getKillerBonusAmount() + "&q";
 				
 				//Add configurable bonus
 				amount = amount + csm.getKillerBonusAmount();
@@ -635,7 +639,7 @@ public class BountyManager
 			{
 				percentAmount = getPercent(amount, csm.getKillerBonusPercent());
 				
-				broadcastString = broadcastString + " And The Kill Bonus Of $" + String.valueOf(percentAmount);
+				broadcastString = broadcastString + " And The Kill Bonus Of &q" + String.valueOf(percentAmount) + "&q";
 				
 				//Add configurable bonus
 				amount = amount + percentAmount;
@@ -695,11 +699,11 @@ public class BountyManager
 		String name = winner.getName();
 		PlayerManager playerManager = new PlayerManager(name);
 		double percentAmount;
-		String broadcastString = name + " Has Survived To Win " + bLib.getFormattedMoney(amount, cm.secondaryColor);
+		String broadcastString = "&p" + name + "&p Has Survived To Win &q" + amount + "&q";
 		
 		if (csm.getSurvivalBonusAmount() > 0)
 		{
-			broadcastString = broadcastString + " And The Survival Bonus Of $" + csm.getSurvivalBonusAmount();
+			broadcastString = broadcastString + " And The Survival Bonus Of &q" + csm.getSurvivalBonusAmount() + "&q";
 			
 			//Add survival flat bonus
 			amount = amount + csm.getSurvivalBonusAmount();
@@ -709,7 +713,7 @@ public class BountyManager
 		{
 			percentAmount = getPercent(csm.getSurvivalBonusPercent(),amount);
 			
-			broadcastString = broadcastString + " And The Survival Bonus Of $" + String.valueOf(percentAmount);
+			broadcastString = broadcastString + " And The Survival Bonus Of &q" + String.valueOf(percentAmount) + "&q";
 			
 			//Add survival percent bonus.
 			amount = amount + percentAmount;
@@ -718,7 +722,7 @@ public class BountyManager
 		bLib.standardBroadcast(broadcastString + "!");
 		
 		//Log the event
-		FC_Bounties.logFile.logMoneyTransaction("[Survivor Reward] Depositing: " + name + " / Amount: " + bLib.getFormattedMoney(amount, cm.secondaryColor));
+		FC_Bounties.logFile.logMoneyTransaction("[Survivor Reward] Depositing: " + name + " / Amount: " + amount);
 		
 		//Give the player the reward
 		FC_Bounties.economy.depositPlayer(name, amount);

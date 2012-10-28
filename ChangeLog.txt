@@ -1,3 +1,11 @@
+Version 3.1:
+
+- Updated for new coloring and money scheming in FC_Suite_Shared. (May have missed numbers, feel free to tell me in comments!)
+- Removed success message when creating bounties.
+- Updated several strings.
+- Added nullpointerexception try/catch to untargetable perm check in SB generation to get rid of a ****ton of annoying errors on reloads.
+- Killing people with eggs can now collect bounties.
+
 Version 3.02:
 
 - Fixed minor error with missing space on bounty list.

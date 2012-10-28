@@ -6,6 +6,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -126,7 +127,7 @@ public class FC_Bounties extends JavaPlugin
 					{
 						msgLib.standardMessage("Sorry but you don't use commands while you have a server bounty on your head.");
 						msgLib.standardMessage("You can drop the bounty with /bounty drop but you will not win the survival bonus.");
-						msgLib.standardMessage("Also, commands take $" + cost + " from you every time you try to use one!");
+						msgLib.standardMessage("Also, commands take &q" + cost + "&q from you every time you try to use one!");
 						msgLib.standardMessage("Finally, you have to see this giant wall of text. Who wants to see this? I mean common, just don't use commands!");
 						
 						economy.withdrawPlayer(event.getPlayer().getName(), cost);
@@ -227,7 +228,7 @@ public class FC_Bounties extends JavaPlugin
 	
 	public class deathListener implements Listener
 	{
-		@EventHandler
+		@EventHandler(priority = EventPriority.HIGHEST)
 		public void onEntityDeath(EntityDeathEvent event)
 		{
 			Player damager = null;
@@ -240,11 +241,14 @@ public class FC_Bounties extends JavaPlugin
 				victim = (Player) event.getEntity();
 				
 				if (victim.getLastDamageCause() == null)
+				{
+					FC_Bounties.plugin.getLogger().info("Null last damage cause.");
 					return;
+				}
 			}
 			else
 				return;
-			
+
 			if (victim.getLastDamageCause() instanceof EntityDamageByEntityEvent)
 			{
 				e = (EntityDamageByEntityEvent) victim.getLastDamageCause();
@@ -262,6 +266,15 @@ public class FC_Bounties extends JavaPlugin
 						damager = (Player) arrow.getShooter();
 					}
 				}
+				else if (e.getDamager() instanceof Egg)
+				{
+					Egg egg = (Egg) e.getDamager();
+					
+					if (egg.getShooter() instanceof Player)
+					{
+						damager = (Player) egg.getShooter();
+					}
+				}
 				else
 					return;
 			}
@@ -273,7 +286,7 @@ public class FC_Bounties extends JavaPlugin
 			
 			//Go through all the bounties, if the player is one of the bounties, then give the bounty to that player.
 			for (int i = 0; i < MAX_BOUNTIES; i++)
-			{	
+			{
 				//If the player killed is equal to the bounty's target, reward the killer by
 				//giving out the bounty. Then remove the bounty.
 				if (victim.getName().toLowerCase().equalsIgnoreCase(bountyHandler.getTarget(i)))

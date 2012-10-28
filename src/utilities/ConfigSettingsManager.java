@@ -170,9 +170,9 @@ public class ConfigSettingsManager
 			setEnableMoneyLogging(true);
 		}
 		
-		if (getVersion() < 3.02)
+		if (getVersion() < 3.1)
 		{
-			setVersion(3.02);
+			setVersion(3.1);
 		}
 	}
 }
