@@ -318,9 +318,6 @@ public class BountiesCE implements CommandExecutor
 		}
 		else if (args[0].equalsIgnoreCase("drop"))
 		{
-			//TODO - remvoe
-			msgLib.standardMessage("Server bounties must be &r" + csm.getTimeBeforeDrop() * .001 + "&r seconds old before they can be dropped.");
-			
 			if (perms.commandDrop() == false)
 				return msgLib.errorNoPermission();
 			

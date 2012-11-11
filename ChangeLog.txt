@@ -1,3 +1,7 @@
+Version 3.11:
+
+- Check FC_Suite_Shared changelog!
+
 Version 3.1:
 
 - Updated for new coloring and money scheming in FC_Suite_Shared. (May have missed numbers, feel free to tell me in comments!)
