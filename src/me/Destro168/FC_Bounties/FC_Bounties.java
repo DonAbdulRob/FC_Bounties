@@ -1,10 +1,11 @@
 package me.Destro168.FC_Bounties;
 
-import me.Destro168.Messaging.MessageLib;
+import me.Destro168.FC_Bounties.Utilities.BountyLogFile;
+import me.Destro168.FC_Bounties.Utilities.ConfigSettingsManager;
+import me.Destro168.FC_Suite_Shared.Messaging.MessageLib;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
@@ -20,26 +21,23 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import org.bukkit.plugin.Plugin;
 
-import utilities.ConfigSettingsManager;
-import utilities.BountyLogFile;
-
 public class FC_Bounties extends JavaPlugin
 {
 	//Variables
     Plugin worldGuard;
     BountyManager bountyHandler;
     int count = 0;
-    
+	
 	public static FC_Bounties plugin;
     public static Economy economy;
     public static BountyLogFile logFile;
 	public static int[] tid = new int[3];
-	public static int playerEntries = 50000;
+	public static int MAX_PLAYER_ENTIRES = 50000;
 	public static int MAX_BOUNTIES = 5000;
-	private ConfigSettingsManager csm;
-	public FileConfiguration config;
 	
     private BountiesCE myExecutor;
+	private ConfigSettingsManager csm;
+	public static int debugCounter = 0;
     
 	@Override
 	public void onDisable()
@@ -52,7 +50,6 @@ public class FC_Bounties extends JavaPlugin
 	{
 		//Store plugin.
 		plugin = this;
-		config = getConfig();
 		
 		//Enable the server economy.
 		setupEconomy();
@@ -289,7 +286,7 @@ public class FC_Bounties extends JavaPlugin
 			{
 				//If the player killed is equal to the bounty's target, reward the killer by
 				//giving out the bounty. Then remove the bounty.
-				if (victim.getName().toLowerCase().equalsIgnoreCase(bountyHandler.getTarget(i)))
+				if (victim.getName().equalsIgnoreCase(bountyHandler.getTarget(i)))
 				{
 					bountyHandler.rewardBountyKill(damager, victim.getName(), (double) bountyHandler.getAmount(i), i);
 				}

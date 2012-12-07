@@ -4,9 +4,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import me.Destro168.FC_Suite_Shared.ConfigManagers.FileConfigurationWrapper;
+import me.Destro168.FC_Bounties.Utilities.ConfigSettingsManager;
+import me.Destro168.FC_Bounties.Utilities.FC_BountiesPermissions;
 import me.Destro168.FC_Suite_Shared.ArgParser;
+import me.Destro168.FC_Suite_Shared.NameMatcher;
 import me.Destro168.FC_Suite_Shared.SuiteConfig;
-import me.Destro168.Messaging.MessageLib;
+import me.Destro168.FC_Suite_Shared.Leaderboards.Leaderboard;
+import me.Destro168.FC_Suite_Shared.Messaging.LogWrapper;
+import me.Destro168.FC_Suite_Shared.Messaging.MessageLib;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,9 +21,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.command.ColouredConsoleSender;
 import org.bukkit.entity.Player;
-
-import utilities.ConfigSettingsManager;
-import utilities.FC_BountiesPermissions;
 
 public class BountiesCE implements CommandExecutor
 {
@@ -116,7 +119,6 @@ public class BountiesCE implements CommandExecutor
 				}
 			}
 			
-			
 			if (playerBountyCount > csm.getMaximumBountiesPerPlayer())
 			{
 				msgLib.standardMessage("You have already created 20 bounties. You must remove old bounties or wait for them to expire.");
@@ -163,13 +165,23 @@ public class BountiesCE implements CommandExecutor
 				//Create empty location
 				Location none = new Location(Bukkit.getWorlds().get(0), 0,0,0);
 				
+				//Get matching name.
+				NameMatcher nm = new NameMatcher();
+				String playerName = nm.getNameByMatch(args[1]);
+				
+				if (playerName.equalsIgnoreCase(""))
+					return msgLib.standardError("Player not found to put bounty on.");
+				
+				LogWrapper logWrapper = new LogWrapper(FC_Bounties.plugin.getLogger());
+				logWrapper.log_Debug("input: " + args[1] + " pName: " + playerName);
+				
 				//Create the new bounty.
-				bountyHandler.addNewBounty(senderName, args[1], intArgs[2], none);
+				bountyHandler.addNewBounty(senderName, playerName, intArgs[2], none);
 				
-				String broadcast = "Created A Bounty To Kill &p" + args[1] + "&p With A Reward Of: &q" + intArgs[2] + "&q. &p" + args[1] +
-						"&p Is Now Worth A Total Of &q" + bountyHandler.getPlayerWorth(args[1]) + "&q";
+				String broadcast = "Created A Bounty To Kill &p" + playerName + "&p With A Reward Of: &q" + intArgs[2] + "&q. &p" + playerName +
+						"&p Is Now Worth A Total Of &q" + bountyHandler.getPlayerWorth(playerName) + "&q";
 				
-				FC_Bounties.logFile.logMoneyTransaction("[Bounty Create] Withdraw: " + senderName + " | Amount: " + bountyCost + " | Target: " + args[1]);
+				FC_Bounties.logFile.logMoneyTransaction("[Bounty Create] Withdraw: " + senderName + " | Amount: " + bountyCost + " | Target: " + playerName);
 				
 				if (csm.getAnnouncePlayerBountyCreation())
 					msgLib.standardBroadcast("&p" + senderName + "&p Has " + broadcast);
@@ -196,6 +208,14 @@ public class BountiesCE implements CommandExecutor
 			}
 			catch (NumberFormatException e)
 			{
+				if (args[1].equalsIgnoreCase("all") && perms.isAdmin())
+				{
+					for (int i = 0; i < FC_Bounties.MAX_BOUNTIES; i++)
+						bountyHandler.deleteBounty(i);
+					
+					return msgLib.successCommand();
+				}
+				
 				return msgLib.errorInvalidCommand();
 			}
 			
@@ -703,6 +723,7 @@ public class BountiesCE implements CommandExecutor
 				msgLib.standardMessage("/bounty admin edit [bounty number] [value] [amount]","Change value of a bounty");
 				msgLib.standardMessage("/bounty admin ignoreWorlds [world1] [world2] [...]","Set the list of worlds to disable bounties in.");
 				msgLib.standardMessage("/bounty admin required [num]","Change number of players that must be online for server bounties to generate.");
+				msgLib.standardMessage("/bounty remove all","Removes all bounties.");
 			}
 		}
 		
@@ -712,70 +733,18 @@ public class BountiesCE implements CommandExecutor
 	
 	public void sendTopKillersBoard()
 	{
-		//Variable Declarations
-		int positionCount = 1;
-		
-		//Display that information to the player.
-		msgLib.standardHeader("Top Killers:");
-		
 		//Create the leaderboard classes
-		TopKillersBoard tkb = new TopKillersBoard();
-		
-		List<String> names = tkb.getTopKillersNames();
-		List<Integer> counts = tkb.getTopKillersCounts();
-		
-		for (int j = names.size() - 1; j > names.size() - 6; j--)
-		{
-			if (counts.get(j) > 0)
-			{
-				msgLib.standardMessage("#" + positionCount + ": &p" + names.get(j) + "&p at " + counts.get(j));
-				positionCount++;
-			}
-			else
-			{
-				msgLib.standardMessage("#" + positionCount + ": " + "[None]!");
-				positionCount++;
-			}
-		}
-		
-		if (positionCount <= 1)
-			msgLib.standardMessage("There Are No Killers Yet!");
-		else
-			msgLib.standardMessage("Finished Listing Top Killers.");
+		FileConfigurationWrapper ccm = new FileConfigurationWrapper(FC_Bounties.plugin.getDataFolder().getAbsolutePath(), "Leaderboards");
+		Leaderboard lb = new Leaderboard(ccm, "TopKillers", "Killers", "kills");
+		lb.displayLeaderboard(msgLib);
 	}
 	
 	public void sendTopSurvivalBoard()
 	{
-		//Variable Declarations
-		int positionCount = 1;
-		
 		//Display that information to the player.
-		msgLib.standardHeader("Top Survivors:");
-		
-		//Display that information to the player.
-		TopSurvivorsBoard tsb = new TopSurvivorsBoard();
-		
-		List<String> names = tsb.getTopSurvivorsNames();
-		List<Integer> counts = tsb.getTopSurvivorsCounts();
-		
-		for (int j = names.size() - 1; j > names.size() - 6; j--)
-		{
-			if (counts.get(j) > 0)
-			{
-				msgLib.standardMessage("#" + positionCount + ": &p" + names.get(j) + " at " + counts.get(j));
-				positionCount++;
-			}
-			else
-			{
-				msgLib.standardMessage("#" + positionCount + ": " + "[None]!");
-				positionCount++;
-			}
-		}
-		
-		if (positionCount <= 1)
-			msgLib.standardMessage("There Are No Survivors Yet.");
-		else
-			msgLib.standardMessage("Finished Listing Top Survivors.");
+		FileConfigurationWrapper fcw = new FileConfigurationWrapper(FC_Bounties.plugin.getDataFolder().getAbsolutePath(), "Leaderboards");
+		Leaderboard lb = new Leaderboard(fcw, "TopSurvivors", "Survivors", "survives");
+		lb.displayLeaderboard(msgLib);
 	}
 }
 

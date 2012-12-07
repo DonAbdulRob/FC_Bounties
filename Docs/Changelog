@@ -1,3 +1,18 @@
+~ FC_Bounties Changelog ~
+
+Version 3.2:
+
+General:
+- Updated bounty victim kill check. Removed useless toLowerCase().
+- Updated leaderboard code so that there is now only one instance of leaderboard which optimizes and shrinks code. Also moved it to FC_Suite_Shared.
+- Fixed tiny issue with survivor leaderboards not working properly because it was using kills in a check.
+- Updated the utilities package paths in the source code.
+- Added the /bounty remove all command to clear out all bounties.
+- Made it so that you can't put bounties on players who haven't been logged on before. As well capitalization will take place as well.
+
+Installation:
+- FC_Suite_Shared is now it's own seperate plugin! Check it out -> http://dev.bukkit.org/server-mods/fc_suite_shared/
+
 Version 3.11:
 
 - Check FC_Suite_Shared changelog!

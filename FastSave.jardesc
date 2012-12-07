@@ -11,8 +11,8 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <file path="/FC_Bounties/FastSave.jardesc"/>
         <file path="/FC_Bounties/plugin.yml"/>
+        <file path="/FC_Bounties/FastSave.jardesc"/>
         <file path="/FC_Bounties/.classpath"/>
         <file path="/FC_Bounties/.project"/>
         <javaElement handleIdentifier="=FC_Bounties/src"/>

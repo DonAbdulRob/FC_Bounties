@@ -5,21 +5,21 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import me.Destro168.ConfigManagers.CustomConfigurationManager;
-import me.Destro168.Messaging.BroadcastLib;
-import me.Destro168.Messaging.MessageLib;
+import me.Destro168.FC_Suite_Shared.ConfigManagers.FileConfigurationWrapper;
+import me.Destro168.FC_Bounties.Utilities.ConfigSettingsManager;
+import me.Destro168.FC_Bounties.Utilities.FC_BountiesPermissions;
+import me.Destro168.FC_Suite_Shared.Leaderboards.Leaderboard;
+import me.Destro168.FC_Suite_Shared.Messaging.BroadcastLib;
+import me.Destro168.FC_Suite_Shared.Messaging.MessageLib;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import utilities.ConfigSettingsManager;
-import utilities.FC_BountiesPermissions;
-
 public class BountyManager
 {
 	private FC_Bounties plugin;
-	private CustomConfigurationManager ccm;
+	private FileConfigurationWrapper ccm;
 	private ConfigSettingsManager csm = new ConfigSettingsManager();
 	private BroadcastLib bLib = new BroadcastLib();
 	
@@ -53,7 +53,7 @@ public class BountyManager
 	{
 		//Assign key variables.
 		plugin = FC_Bounties.plugin;
-		ccm = new CustomConfigurationManager(plugin.getDataFolder().getAbsolutePath(), "bounties");
+		ccm = new FileConfigurationWrapper(plugin.getDataFolder().getAbsolutePath(), "bounties");
 	}
 	
 	public int addNewBounty(String creator, String target, int amount, Location loc)
@@ -616,7 +616,9 @@ public class BountyManager
 	public void rewardBountyKill(Player killer, String killedName, double amount, int bountyID)
 	{
 		//Variable Declarations
-		TopKillersBoard tkb = new TopKillersBoard();
+		FileConfigurationWrapper fcw = new FileConfigurationWrapper(FC_Bounties.plugin.getDataFolder().getAbsolutePath(), "Leaderboards");
+		Leaderboard lb = new Leaderboard(fcw, "TopKilers", "Killers", "kills");
+		
 		String name = killer.getName();
 		PlayerManager playerManager = new PlayerManager(name);
 		String broadcastString = "&p" + name + "&p Has Killed &p" + killedName + "&p To Win &q" + amount + "&q";
@@ -684,7 +686,7 @@ public class BountyManager
 		playerManager.setKills(playerManager.getKills() + 1);
 		
 		//Update the leaderboard.
-		tkb.attemptUpdateKillerLeaderBoard(name, playerManager.getKills());
+		lb.attemptUpdate(name, playerManager.getKills());
 		
 		//Prevent bounties from being placed on the same person.
 		csm.setLastBounty(killedName);
@@ -695,7 +697,10 @@ public class BountyManager
 	
 	public void rewardBountySurvive(Player winner, double amount, int bountyID)
 	{
-		TopSurvivorsBoard tsb = new TopSurvivorsBoard();
+		//Variable Declarations
+		FileConfigurationWrapper fcw = new FileConfigurationWrapper(FC_Bounties.plugin.getDataFolder().getAbsolutePath(), "Leaderboards");
+		Leaderboard lb = new Leaderboard(fcw, "TopSurvivors", "Survivors", "Survives");
+		
 		String name = winner.getName();
 		PlayerManager playerManager = new PlayerManager(name);
 		double percentAmount;
@@ -734,7 +739,7 @@ public class BountyManager
 		playerManager.setSurvives(playerManager.getSurvives() + 1);
 		
 		//Update the leaderboard.
-		tsb.attemptUpdateSurvivorLeaderBoard(name, playerManager.getKills());
+		lb.attemptUpdate(name, playerManager.getSurvives());
 		
 		//Prevent bounties from being placed on the same person.
 		csm.setLastBounty(name);

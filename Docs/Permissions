@@ -1,3 +1,5 @@
+~ FC_Bounties Permissions ~
+
 FC_Bounties.admin -> Shows admin commands and gives admin output like targets when targets are hidden, etc. Also gives permission to admin sub-command.
 FC_Bounties.untargetable -> Server bounties will not be generated on anything with this permission node.
 FC_Bounties.command.create -> Permission to use create sub-command.

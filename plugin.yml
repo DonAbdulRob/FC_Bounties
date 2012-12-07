@@ -1,6 +1,6 @@
 name: FC_Bounties
 main: me.Destro168.FC_Bounties.FC_Bounties
-version: 3.11
+version: 3.2
 description: Allows for player bounties to be set.
 commands:
    bounty:

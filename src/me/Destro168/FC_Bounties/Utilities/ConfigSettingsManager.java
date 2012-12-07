@@ -1,4 +1,4 @@
-package utilities;
+package me.Destro168.FC_Bounties.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,9 +170,9 @@ public class ConfigSettingsManager
 			setEnableMoneyLogging(true);
 		}
 		
-		if (getVersion() < 3.11)
+		if (getVersion() < 3.2)
 		{
-			setVersion(3.11);
+			setVersion(3.2);
 		}
 	}
 }

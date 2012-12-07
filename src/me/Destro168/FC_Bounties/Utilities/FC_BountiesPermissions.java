@@ -1,4 +1,4 @@
-package utilities;
+package me.Destro168.FC_Bounties.Utilities;
 
 import me.Destro168.FC_Suite_Shared.PermissionManager;
 
