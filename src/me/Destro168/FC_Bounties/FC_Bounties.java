@@ -1,7 +1,10 @@
 package me.Destro168.FC_Bounties;
 
+import java.util.List;
+
 import me.Destro168.FC_Bounties.Utilities.BountyLogFile;
 import me.Destro168.FC_Bounties.Utilities.ConfigSettingsManager;
+import me.Destro168.FC_Suite_Shared.AutoUpdate;
 import me.Destro168.FC_Suite_Shared.Messaging.MessageLib;
 import net.milkbowl.vault.economy.Economy;
 
@@ -81,7 +84,7 @@ public class FC_Bounties extends JavaPlugin
 			public void run() {
 				bountyHandler.purgeOldBounties();
 			}
-		} , 0, 432000); //21600 = 6 hours. * 20
+		}, 0, 432000); //21600 = 6 hours. * 20
 		
 		//Start running automatic server bounties.
 		tid[1] = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() 
@@ -90,7 +93,13 @@ public class FC_Bounties extends JavaPlugin
 			public void run() {
 				bountyHandler.manageServerBounty();
 			}
-		} , 0, csm.getBountyIntervalLength() * 20); //Run every 60 seconds.
+		}, 0, csm.getBountyIntervalLength() * 20); //Run every 60 seconds.
+		
+		try {
+			new AutoUpdate(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		//Tell the user that the plugin successfully enabled.
 		plugin.getLogger().info("Enabled Successfully.");
@@ -245,7 +254,16 @@ public class FC_Bounties extends JavaPlugin
 			}
 			else
 				return;
-
+			
+			ConfigSettingsManager csm = new ConfigSettingsManager();
+			List<String> ignoreKillWorlds = csm.getIgnoreKillWorlds();
+			
+			if (ignoreKillWorlds != null)
+			{
+				if (ignoreKillWorlds.contains(victim.getWorld().getName()))
+					return;
+			}
+			
 			if (victim.getLastDamageCause() instanceof EntityDamageByEntityEvent)
 			{
 				e = (EntityDamageByEntityEvent) victim.getLastDamageCause();

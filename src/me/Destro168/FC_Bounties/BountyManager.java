@@ -13,6 +13,7 @@ import me.Destro168.FC_Suite_Shared.Messaging.BroadcastLib;
 import me.Destro168.FC_Suite_Shared.Messaging.MessageLib;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -99,17 +100,18 @@ public class BountyManager
 		MessageLib msgLib = new MessageLib(target);
 		FC_BountiesPermissions perms = new FC_BountiesPermissions(target);
 		String targetName = target.getName();
+		BroadcastLib bLib = new BroadcastLib();
 		
 		addNewBounty("[SERVER]", targetName, csm.getGeneratedBountyBase(), target.getLocation());
 		
 		//Broadcast a message.
 		if (csm.getEnableServerTargetName() == true)
-			msgLib.standardBroadcast("A Server Bounty Has Been Created. The Target Is: &p" + targetName + "&p");
+			bLib.standardBroadcast("A Server Bounty Has Been Created. The Target Is: &p" + targetName + "&p");
 		else
-			msgLib.standardBroadcast("A Server Bounty Has Been Created.");
+			bLib.standardBroadcast("A Server Bounty Has Been Created.");
 		
 		//Tell all online admins who the server bounty is.
-		msgLib.broadcastToAdmins("New Server Bounty Target: &p" + targetName + "&p");
+		bLib.broadcastToAdmins("New Server Bounty Target: &p" + targetName + "&p");
 		
 		//Tell the target they are the server bounty.
 		if (csm.getEnableServerTargetName() == false)
@@ -138,61 +140,69 @@ public class BountyManager
 		int z;
 		
 		List<String> message = new ArrayList<String>();
+		String target = getTarget(i);
 		
 		if (contentLevel == 1)
 		{	
 			if (csm.getEnableCreatorName())
-			{
-				message.add("[C]: ");
-				message.add(getCreator(i) + " ");
-			}
+				message.add(getCreator(i));
+			else
+				message.add("A user");
+			
+			message.add(" wants ");
 			
 			if (csm.getEnablePlayerTargetName())
-			{
-				message.add("[T]: ");
-				message.add(getTarget(i) + " ");
-			}
+				message.add(target);
+			else
+				message.add("a user");
 			
-			message.add("[R]: ");
-			message.add("&q" + getAmount(i) + "&q");
+			message.add(" killed for ");
+			message.add("&q" + getAmount(i) + "&q ");
 			
 			if (csm.getEnablePlayerCoordinates() == true)
 			{
 				x = getPosX(i);
 				y = getPosY(i);
 				z = getPosZ(i);
+
+				message.add("at ");
 				
-				if (csm.getEnableRandomCoordinates())
+				if (Bukkit.getServer().getPlayer(target) == null)
+					message.add(ChatColor.GRAY + "(" + String.valueOf(x) + "," + String.valueOf(y) + "," + String.valueOf(z) + ")");
+				else
 				{
-					//Get the offset from configuration.
-					offset = csm.getRandomOffsetAmount();
+					if (csm.getEnableRandomCoordinates())
+					{
+						//Get the offset from configuration.
+						offset = csm.getRandomOffsetAmount();
+						
+						//Apply the random offset.
+						x = x + rand.nextInt(offset);
+						y = y + rand.nextInt(offset);
+						z = z + rand.nextInt(offset);
+					}
 					
-					//Apply the random offset.
-					x = x + rand.nextInt(offset);
-					y = y + rand.nextInt(offset);
-					z = z + rand.nextInt(offset);
+					message.add("(");
+					message.add(String.valueOf(x));
+					
+					message.add(",");
+					message.add(String.valueOf(y));
+					
+					message.add(",");
+					message.add(String.valueOf(z));
+					message.add(")");
 				}
-				
-				message.add("[X]: ");
-				message.add(String.valueOf(x) + " ");
-				
-				message.add("[Y]: ");
-				message.add(String.valueOf(y) + " ");
-				
-				message.add("[Z]: ");
-				message.add(String.valueOf(z));
 			}
 		}
 		else if (contentLevel == 2)
 		{
 			if (csm.getEnableServerTargetName())
-			{
-				message.add("[T]: ");
-				message.add(getTarget(i) + " ");
-			}
+				message.add(target);
+			else
+				message.add("A user can be");
 			
-			message.add("[R]: ");
-			message.add("&q" + getAmount(i) + "&q");
+			message.add(" killed for ");
+			message.add("&q" + getAmount(i) + "&q ");
 			
 			if (csm.getEnableServerCoordinates() == true)
 			{
@@ -200,25 +210,33 @@ public class BountyManager
 				y = getPosY(i);
 				z = getPosZ(i);
 				
-				if (csm.getEnableRandomCoordinates())
+				message.add("at ");
+				
+				if (Bukkit.getServer().getPlayer(target) == null)
+					message.add(ChatColor.GRAY + "(" + String.valueOf(x) + "," + String.valueOf(y) + "," + String.valueOf(z) + ")");
+				else
 				{
-					//Get the offset from configuration.
-					offset = csm.getRandomOffsetAmount();
+					if (csm.getEnableRandomCoordinates())
+					{
+						//Get the offset from configuration.
+						offset = csm.getRandomOffsetAmount();
+						
+						//Apply the random offset.
+						x = x + rand.nextInt(offset);
+						y = y + rand.nextInt(offset);
+						z = z + rand.nextInt(offset);
+					}
 					
-					//Apply the random offset.
-					x = x + rand.nextInt(offset);
-					y = y + rand.nextInt(offset);
-					z = z + rand.nextInt(offset);
+					message.add("(");
+					message.add(String.valueOf(x));
+					
+					message.add(",");
+					message.add(String.valueOf(y));
+					
+					message.add(",");
+					message.add(String.valueOf(z));
+					message.add(")");
 				}
-				
-				message.add("[X]: ");
-				message.add(String.valueOf(x) + " ");
-				
-				message.add("[Y]: ");
-				message.add(String.valueOf(y) + " ");
-				
-				message.add("[Z]: ");
-				message.add(String.valueOf(z));
 			}
 		}
 		
@@ -293,7 +311,7 @@ public class BountyManager
 				//Update the server bounty if the target is still online or else delete it and create a new one.
 				for (Player player: Bukkit.getServer().getOnlinePlayers())
 				{
-					if (player.getName() == getTarget(serverBounty)) 
+					if (player.getName().equalsIgnoreCase(getTarget(serverBounty))) 
 					{
 						//Store the target.
 						target = player;
@@ -318,7 +336,7 @@ public class BountyManager
 				{
 					for (Player player: Bukkit.getServer().getOnlinePlayers())
 					{
-						if (player.getName() == getTarget(i))
+						if (player.getName().equalsIgnoreCase(getTarget(i)))
 						{
 							setPosX(i, (int) player.getLocation().getX());
 							setPosY(i, (int) player.getLocation().getY());
@@ -617,7 +635,7 @@ public class BountyManager
 	{
 		//Variable Declarations
 		FileConfigurationWrapper fcw = new FileConfigurationWrapper(FC_Bounties.plugin.getDataFolder().getAbsolutePath(), "Leaderboards");
-		Leaderboard lb = new Leaderboard(fcw, "TopKilers", "Killers", "kills");
+		Leaderboard lb = new Leaderboard(fcw, "TopKillers", "Killers", "kills");
 		
 		String name = killer.getName();
 		PlayerManager playerManager = new PlayerManager(name);

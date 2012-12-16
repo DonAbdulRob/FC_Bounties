@@ -11,7 +11,7 @@ import me.Destro168.FC_Suite_Shared.ArgParser;
 import me.Destro168.FC_Suite_Shared.NameMatcher;
 import me.Destro168.FC_Suite_Shared.SuiteConfig;
 import me.Destro168.FC_Suite_Shared.Leaderboards.Leaderboard;
-import me.Destro168.FC_Suite_Shared.Messaging.LogWrapper;
+import me.Destro168.FC_Suite_Shared.Messaging.BroadcastLib;
 import me.Destro168.FC_Suite_Shared.Messaging.MessageLib;
 
 import org.bukkit.Bukkit;
@@ -172,9 +172,6 @@ public class BountiesCE implements CommandExecutor
 				if (playerName.equalsIgnoreCase(""))
 					return msgLib.standardError("Player not found to put bounty on.");
 				
-				LogWrapper logWrapper = new LogWrapper(FC_Bounties.plugin.getLogger());
-				logWrapper.log_Debug("input: " + args[1] + " pName: " + playerName);
-				
 				//Create the new bounty.
 				bountyHandler.addNewBounty(senderName, playerName, intArgs[2], none);
 				
@@ -184,7 +181,10 @@ public class BountiesCE implements CommandExecutor
 				FC_Bounties.logFile.logMoneyTransaction("[Bounty Create] Withdraw: " + senderName + " | Amount: " + bountyCost + " | Target: " + playerName);
 				
 				if (csm.getAnnouncePlayerBountyCreation())
-					msgLib.standardBroadcast("&p" + senderName + "&p Has " + broadcast);
+				{
+					BroadcastLib bLib = new BroadcastLib();
+					bLib.standardBroadcast("&p" + senderName + "&p Has " + broadcast);
+				}
 				else
 					msgLib.standardMessage("Successfully " + broadcast);
 				
@@ -266,7 +266,10 @@ public class BountiesCE implements CommandExecutor
 				
 				//Display the bounty is removed if you announce bounty creation.
 				if (csm.getAnnouncePlayerBountyCreation() == true)
-					msgLib.standardBroadcast(removeMessage);
+				{
+					BroadcastLib bLib = new BroadcastLib();
+					bLib.standardBroadcast(removeMessage);
+				}
 				else
 					msgLib.standardMessage(removeMessage);
 				
@@ -316,6 +319,9 @@ public class BountiesCE implements CommandExecutor
 			{
 				msgLib.standardMessage("Listing Specified Bounties: ");
 				
+				if (csm.getEnableRandomCoordinates())
+					msgLib.standardMessage("Bounty coordinates are within " + csm.getRandomOffsetAmount() + " blocks of target.");
+				
 				if (fap.getArg(1).equalsIgnoreCase("mine"))
 					hasOne = listBounties(intArgs[2], true);
 				
@@ -351,8 +357,10 @@ public class BountiesCE implements CommandExecutor
 				{
 					if (bountyHandler.getTarget(bountyHandler.getServerBountyID()).equalsIgnoreCase(senderName))
 					{
+						BroadcastLib bLib = new BroadcastLib();
+						
 						//Announce they chickened out.
-						msgLib.standardBroadcast("The person with the server bounty chickened out!");
+						bLib.standardBroadcast("The person with the server bounty chickened out!");
 						
 						//Delete the bounty
 						bountyHandler.deleteBounty(bountyHandler.getServerBountyID());
@@ -644,18 +652,18 @@ public class BountiesCE implements CommandExecutor
 					for (String part : bountyHandler.getInformation(startPoint,1,cm.primaryColor))
 						message.add(part);
 					
-					msgLib.standardMessage(message);
+					msgLib.displayFormattedList(message);
 				}
 				else
 				{
 					message.add(String.valueOf(startPoint + ": "));
-					message.add("[C]: ");
-					message.add("[Server] ");
+					message.add("The Server");
+					message.add(" wants ");
 					
 					for (String part : bountyHandler.getInformation(startPoint,2,cm.primaryColor))
 						message.add(part);
 					
-					msgLib.standardMessage(message);
+					msgLib.displayFormattedList(message);
 					
 					if (perms.isAdmin())
 						msgLib.standardMessage("Current Server Bounty Target", bountyHandler.getTarget(bountyHandler.getServerBountyID()));

@@ -44,6 +44,7 @@ public class ConfigSettingsManager
 	public void setGeneratedBountyBase(int x)  { config = plugin.getConfig(); config.set("Setting.generatedBountyBase", x); plugin.saveConfig(); }
 	public void setIgnorePlayerExemptionSetting(boolean x) { config = plugin.getConfig(); config.set("Setting.ignorePlayerExemptionSetting", x); plugin.saveConfig(); }
 	public void setIgnoreWorlds(List<String> x) { config = plugin.getConfig(); config.set("Setting.ignoreWorlds", x); plugin.saveConfig(); }
+	public void setIgnoreKillWorlds(List<String> x) { config = plugin.getConfig(); config.set("Setting.ignoreKillWorlds", x); plugin.saveConfig(); }
 	public void setEnableIgnoreWorlds(boolean x) { config = plugin.getConfig(); config.set("Setting.enableIgnoreWorlds", x); plugin.saveConfig(); }
 	public void setBountyCreationTaxPercent(double x) { config = plugin.getConfig(); config.set("Setting.bountyCreationTaxPercent", x); plugin.saveConfig(); }
 	public void setBountyStealPercent(double x) { config = plugin.getConfig(); config.set("Setting.bountyStealPercent", x); plugin.saveConfig(); }
@@ -88,6 +89,7 @@ public class ConfigSettingsManager
 	public boolean getIgnorePlayerExemptionSetting() { config = plugin.getConfig(); return config.getBoolean("Setting.ignorePlayerExemptionSetting"); }
 	public boolean getEnableIgnoreWorlds() { config = plugin.getConfig(); return config.getBoolean("Setting.enableIgnoreWorlds"); }
 	public List<String> getIgnoreWorlds() { config = plugin.getConfig(); return config.getStringList("Setting.ignoreWorlds"); }
+	public List<String> getIgnoreKillWorlds() { config = plugin.getConfig(); return config.getStringList("Setting.ignoreKillWorlds"); }
 	public double getBountyCreationTaxPercent() { config = plugin.getConfig(); return config.getDouble("Setting.bountyCreationTaxPercent"); }
 	public double getBountyStealPercent() { config = plugin.getConfig(); return config.getDouble("Setting.bountyStealPercent"); }
 	public double getBountyDeathPercent() { config = plugin.getConfig(); return config.getDouble("Setting.bountyDeathPercent"); }
@@ -170,9 +172,26 @@ public class ConfigSettingsManager
 			setEnableMoneyLogging(true);
 		}
 		
-		if (getVersion() < 3.2)
+		if (getVersion() < 3.25)
 		{
-			setVersion(3.2);
+			setVersion(3.25);
+			
+			List<String> ignoreKillWorlds = new ArrayList<String>();
+			ignoreKillWorlds.add("omega");
+			setIgnoreWorlds(ignoreKillWorlds);
+			
+			setIgnoreKillWorlds(ignoreKillWorlds);
+		}
+		
+		if (getVersion() < 3.27)
+		{
+			setVersion(3.27);
+			setEnableServerCoordinates(true);
+		}
+		
+		if (getVersion() < 3.29)
+		{
+			setVersion(3.29);
 		}
 	}
 }
