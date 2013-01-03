@@ -1,0 +1,100 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ___           ___                    ___           ___                         ___           ___   
+     /\__\         /\__\                  /\__\         /\__\                       /\  \         /\  \  
+    /:/ _/_       /:/  /                 /:/ _/_       /:/ _/_         ___          \:\  \       /::\  \ 
+   /:/ /\__\     /:/  /                 /:/ /\  \     /:/ /\__\       /\__\          \:\  \     /:/\:\__\
+  /:/ /:/  /    /:/  /  ___            /:/ /::\  \   /:/ /:/ _/_     /:/  /      ___  \:\  \   /:/ /:/  /
+ /:/_/:/  /    /:/__/  /\__\          /:/_/:/\:\__\ /:/_/:/ /\__\   /:/__/      /\  \  \:\__\ /:/_/:/  / 
+ \:\/:/  /     \:\  \ /:/  /          \:\/:/ /:/  / \:\/:/ /:/  /  /::\  \      \:\  \ /:/  / \:\/:/  /  
+  \::/__/       \:\  /:/  /            \::/ /:/  /   \::/_/:/  /  /:/\:\  \      \:\  /:/  /   \::/__/   
+   \:\  \        \:\/:/  /              \/_/:/  /     \:\/:/  /   \/__\:\  \      \:\/:/  /     \:\  \   
+    \:\__\        \::/  /                 /:/  /       \::/  /         \:\__\      \::/  /       \:\__\  
+     \/__/         \/__/                  \/__/         \/__/           \/__/       \/__/         \/__/  
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Table of Contents:
+I: Introduction
+    a: Command Usage
+    b. Optional Plugin Dependency
+II: Configuring the Configuration File
+III: Additional Information
+	a. Regarding Player Count:
+	b. Server Bounty Generation Rules
+	c. Anti-Spawn Camping Feature
+
+I: Introduction
+
+	This is the help for FC_Bounties. This help will detail all the steps to configure this plugin.
+
+a. Command Usage
+
+	The base command for the plugin is /bounty. This command will show you the help for the plugin.
+
+b. Optional Plugin Dependency
+
+	This plugin doesn’t require World Guard, but if you want to enable server bounty pvp bypassing, then you need it: http://dev.bukkit.org/server-mods/worldguard/
+
+II: Configuring the Configuration File
+
+This section explains the configuration settings that can be found in the FC_Bounties configuration file. All times are in milliseconds.
+
+- invulnerabilityEnabled -> Should players with no items be unable to participate in pvp? (Anti-Spawn Camp Feature)
+- playersCanExempt -> Can players set themselves to exempt?
+- playersCanDrop -> Can players drop bounties?
+- enableCreatorName -> Show the creator name for bounties?
+- enablePlayerTargetName -> Should targets be shown for PB's?
+- enableServerTargetName -> Should targets be shown for SB's?
+- enablePlayerCoordinates -> Should coordinates be shown for PB's?
+- enableServerCoordinates -> Should coordinates be shown for SB's?
+- enableRandomCoordinates -> Should coordinates be random for SB's?
+- serverCoordinateUpdate -> Update coordinates every bounty interval for SB's?
+- playerCoordinateUpdate -> Update coordinates every bounty interval for PB's?
+- forcePvp -> Do you want players to be killed anywhere if they have a bounty? (Bypass WG pvp flag)
+- bountyGeneration -> Should server bounties be generated?
+- bountyIntervalLength -> How much time in between bounty intervals?
+- tier0BaseMultiplier -> How much to multiply the base by for Tier 0? (Tiers refer to bounty age. Tiers increase after Tier[x]Length (the other config option) has passed. The base is number of online players. So the formula is: ([number of players online] * [this number])
+- tier1BaseMultiplier -> How much for Tier 1?
+- tier2BaseMultiplier -> Tier 2?
+- tier3BaseMultiplier -> Tier 3?
+- tier0Length -> How long should tier 0 last?
+- tier1Length -> Tier 1?
+- tier2Length -> Tier 2?
+- tier3Length -> Tier 3?
+- requiredPlayers -> How many players need to be on for SB generation?
+- survivalBonusAmount -> How much to reward players for surviving SB's as a flat amount.
+- killerBonusAmount -> How much to reward players for killing SB targets flat amount.
+- survivalBonusPercent -> How much to reward players for surviving SB's as a percent. (flat amount must be set at 0 for percents to take effect)
+- killerBonusPercent -> How much to reward players for killing SB targets a percent. (flat amount must be set at 0 for percents to take effect)
+- minimumBountyValue -> How much must be invested into a PB minimum?
+- maximumBountiesPerPlayer -> Maximum number of bounties per player?
+- randomOffsetAmount -> How much to offset coordinates for random bountes? (If enabled)
+- timeBeforeDrop -> How long must a person have a bounty before allowed to drop it?
+- lastBounty -> Don't change, this is just the target of the last server bounty to prevent being on the same person twice.
+- blockedCommandUseCost -> How much to charge players Server Bounty targets for using commands as the server bounty target. Set to 0 to disable command blocking.
+- announcePlayerBountyCreation -> Announce created and removed bounties to all players or not?
+- ignorePlayerExemptionSetting -> Bypass the exemption status of all players for SB generation?
+- enableIgnoreWorlds -> Enable multi-world support for preventing SB generation on players in specified worlds?
+- ignoreWorlds -> List the worlds you want SB generation to ignore. It's yaml format so use spaces and put each world on a new line with a dash and space before the world name. Example: ' - [WorldName]'
+- tierBaseBonus0 -> How much should you add to bounties per interval flat? (This is if you don't want to multiply by number of online players but still want bounties to increase).
+- tierBaseBonus1 -> For Tier 1?
+- tierBaseBonus2 -> For Tier 2?
+- tierBaseBonus3 -> For Tier 3?
+- bountyCreationTaxPercent -> Allows you to set a customizable tax percent that will be deducted whenever players create bounties.
+- bountyStealPercent-> Allows you to set a customizable percent of money that players will steal from each other when taking bounties from players. I personally think that this is bad option to set without having a sufficiently high minimum bounty creation cost OR having a low limit for number of bounties players can make because players would be able to put 100 bounties on a player and, assuming the steal percent is 1%, take all of a players money. You are warned.
+- bountyDeathPercent-> Allows you to set a customizable percent of money players will lose when killed from a bounty. The same warning for bounty steal percent applies here because you can also take 100% of a players money with even just 1% if your settings aren't created wisely.
+- enableMoneyLogging-> Logs all money transactions into a separate file at /plugins/FC_Bounties/moneyLogging.txt. 
+
+III: Additional Information:
+
+a. Regarding Player Count:
+
+The player online count is determined by the number of players online that do not have the exemption permission and haven’t set themselves to exempt with the command or in the permissions file. The /bounty admin sb command is quite useful for seeing how many players are currently on relative to the amount needed. You can also change the amount with the /bounty admin required command. The admin commands should honestly be used with extreme caution as they are very powerful and cause problems. They can all be viewed in-game with /bounty admin.
+
+b. Server Bounty Generation Rules
+
+Server bounties are always created whenever there isn’t one active and there are enough players online. Server bounties will be dropped automatically if there aren’t enough players online, but will increase in value when a person with the bounty on them survives for a set period of time. If the player is killed, the bounty is given to the killer. However, if the player survives, then the bounty will be given to the player and a new server bounty will generate. Also there is an optional World Guard no-pvp bypass to make sure that people with server bounties on them can be killed anywhere!
+
+c. Anti-Spawn Camping Feature
+
+The final notable feature of this plugin is the anti-spawn camping feature. Players with no items will be unable to receive or deal damage from other players. Of course, if a player has a server bounty on himself or herself, this feature will be bypassed. The feature is able to be disabled via invulnerabilityEnabled if desired.

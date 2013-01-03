@@ -189,9 +189,9 @@ public class ConfigSettingsManager
 			setEnableServerCoordinates(true);
 		}
 		
-		if (getVersion() < 3.29)
+		if (getVersion() < 3.3)
 		{
-			setVersion(3.29);
+			setVersion(3.3);
 		}
 	}
 }

@@ -6,6 +6,6 @@
 	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/plugins/WorldEdit.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/plugins/WorldGuard.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/plugins/FC_Suite_Shared.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/craftbukkit.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Destro/Desktop/Locathost server/bukkit.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import me.Destro168.FC_Suite_Shared.ConfigManagers.FileConfigurationWrapper;
+import me.Destro168.FC_Bounties.Utilities.BountyHistory;
 import me.Destro168.FC_Bounties.Utilities.ConfigSettingsManager;
 import me.Destro168.FC_Bounties.Utilities.FC_BountiesPermissions;
 import me.Destro168.FC_Suite_Shared.Leaderboards.Leaderboard;
@@ -133,8 +134,6 @@ public class BountyManager
 	
 	public List<String> getInformation(int i, int contentLevel, String standardMessageColor)
 	{
-		Random rand = new Random();
-		int offset;
 		int x;
 		int y;
 		int z;
@@ -164,22 +163,36 @@ public class BountyManager
 				x = getPosX(i);
 				y = getPosY(i);
 				z = getPosZ(i);
-
+				
 				message.add("at ");
 				
 				if (Bukkit.getServer().getPlayer(target) == null)
 					message.add(ChatColor.GRAY + "(" + String.valueOf(x) + "," + String.valueOf(y) + "," + String.valueOf(z) + ")");
 				else
 				{
-					if (csm.getEnableRandomCoordinates())
+					if (FC_Bounties.bountyHistoryList != null)
 					{
-						//Get the offset from configuration.
-						offset = csm.getRandomOffsetAmount();
 						
-						//Apply the random offset.
-						x = x + rand.nextInt(offset);
-						y = y + rand.nextInt(offset);
-						z = z + rand.nextInt(offset);
+						if (!FC_Bounties.bountyHistoryList.contains(i))
+							FC_Bounties.bountyHistoryList.add(new BountyHistory(i));
+						
+						BountyHistory b = FC_Bounties.bountyHistoryList.get(i);
+						
+						if (b.canRefresh() == true)
+						{
+							//Apply random offset
+							x = x + this.getRandomCoord();
+							y = y + this.getRandomCoord();
+							z = z + this.getRandomCoord();
+							
+							b.updateLastCoordinates(x,y,z);
+						}
+						else
+						{
+							x = b.x;
+							y = b.y;
+							z = b.z;
+						}
 					}
 					
 					message.add("(");
@@ -216,15 +229,20 @@ public class BountyManager
 					message.add(ChatColor.GRAY + "(" + String.valueOf(x) + "," + String.valueOf(y) + "," + String.valueOf(z) + ")");
 				else
 				{
-					if (csm.getEnableRandomCoordinates())
+					if (FC_Bounties.bountyHistoryList != null)
 					{
-						//Get the offset from configuration.
-						offset = csm.getRandomOffsetAmount();
+						if (!FC_Bounties.bountyHistoryList.contains(i))
+							FC_Bounties.bountyHistoryList.add(new BountyHistory(i));
 						
-						//Apply the random offset.
-						x = x + rand.nextInt(offset);
-						y = y + rand.nextInt(offset);
-						z = z + rand.nextInt(offset);
+						if (FC_Bounties.bountyHistoryList.get(i).canRefresh() == true)
+						{
+							//Apply random offset
+							x = x + this.getRandomCoord();
+							y = y + this.getRandomCoord();
+							z = z + this.getRandomCoord();
+							
+							FC_Bounties.bountyHistoryList.get(i).updateLastCoordinates(x,y,z);
+						}
 					}
 					
 					message.add("(");
@@ -241,6 +259,16 @@ public class BountyManager
 		}
 		
 		return message;
+	}
+	
+	private int getRandomCoord()
+	{
+		Random rand = new Random();
+		
+		if (rand.nextBoolean() == true)
+			return rand.nextInt(csm.getRandomOffsetAmount());
+		else
+			return rand.nextInt(csm.getRandomOffsetAmount()) * -1;
 	}
 	
 	public boolean hasServerBounty(String name)

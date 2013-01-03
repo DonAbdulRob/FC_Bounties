@@ -19,7 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.command.ColouredConsoleSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 public class BountiesCE implements CommandExecutor
@@ -27,7 +27,7 @@ public class BountiesCE implements CommandExecutor
 	private final int bountyDisplayCap = 15;
 	
 	private BountyManager bountyHandler;
-	private ColouredConsoleSender console;
+	private ConsoleCommandSender console;
 	private Player player;
 	private String senderName;
 	
@@ -67,16 +67,16 @@ public class BountiesCE implements CommandExecutor
 			player = (Player) sender;
 			console = null;
 			perms = new FC_BountiesPermissions(player);
-			msgLib = new MessageLib(player);
+			msgLib = new MessageLib(sender);
 			senderName = player.getName();
 			playerManager = new PlayerManager(senderName);
 		}
-		else if (sender instanceof ColouredConsoleSender)
+		else if (sender instanceof ConsoleCommandSender)
 		{
 			player = null;
-			console = (ColouredConsoleSender) sender;
+			console = (ConsoleCommandSender) sender;
 			perms = new FC_BountiesPermissions(true);
-			msgLib = new MessageLib(console);
+			msgLib = new MessageLib(sender);
 			senderName = "[Console]";
 		}
 		else

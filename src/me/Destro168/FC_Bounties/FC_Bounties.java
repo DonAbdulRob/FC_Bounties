@@ -1,7 +1,9 @@
 package me.Destro168.FC_Bounties;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import me.Destro168.FC_Bounties.Utilities.BountyHistory;
 import me.Destro168.FC_Bounties.Utilities.BountyLogFile;
 import me.Destro168.FC_Bounties.Utilities.ConfigSettingsManager;
 import me.Destro168.FC_Suite_Shared.AutoUpdate;
@@ -37,6 +39,7 @@ public class FC_Bounties extends JavaPlugin
 	public static int[] tid = new int[3];
 	public static int MAX_PLAYER_ENTIRES = 50000;
 	public static int MAX_BOUNTIES = 5000;
+	public static List<BountyHistory> bountyHistoryList;
 	
     private BountiesCE myExecutor;
 	private ConfigSettingsManager csm;
@@ -100,6 +103,9 @@ public class FC_Bounties extends JavaPlugin
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		if (csm.getEnableRandomCoordinates())
+			bountyHistoryList = new ArrayList<BountyHistory>();
 		
 		//Tell the user that the plugin successfully enabled.
 		plugin.getLogger().info("Enabled Successfully.");
