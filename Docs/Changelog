@@ -2,6 +2,6 @@
 
 Version 3.3:
 
-- Updated for new CB 1.4.6 and FC_Suite_Shared.
+- Updated to CB Beta 1.4.6-R0.3.
 - Made it so that random coordinates can be negative.
 - Added delay to rate at which bounty coordinates for players will update to 5 minutes.
