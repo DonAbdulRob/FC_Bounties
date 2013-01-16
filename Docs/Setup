@@ -11,17 +11,21 @@
     \:\__\        \::/  /                 /:/  /       \::/  /         \:\__\      \::/  /       \:\__\  
      \/__/         \/__/                  \/__/         \/__/           \/__/       \/__/         \/__/  
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Table of Contents:
+* Table of Contents ~ FC_Bounties Setup *
+
 I: Introduction
     a: Command Usage
     b. Optional Plugin Dependency
+
 II: Configuring the Configuration File
+
 III: Additional Information
 	a. Regarding Player Count:
 	b. Server Bounty Generation Rules
 	c. Anti-Spawn Camping Feature
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 I: Introduction
 

@@ -1,4 +1,10 @@
-~ FC_Bounties Old Changelog ~
+~ FC_Bounties Version History ~
+
+Version 3.3:
+
+- Updated to CB Beta 1.4.6-R0.3.
+- Made it so that random coordinates can be negative.
+- Added delay to rate at which bounty coordinates for players will update to 5 minutes.
 
 Version 3.29:
 
