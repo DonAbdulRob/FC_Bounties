@@ -1,7 +1,6 @@
 package me.Destro168.FC_Bounties;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import me.Destro168.FC_Suite_Shared.ConfigManagers.FileConfigurationWrapper;
@@ -49,7 +48,6 @@ public class BountiesCE implements CommandExecutor
 		ArgParser fap = new ArgParser(args2);
 		cm = new SuiteConfig();
 		
-		Date now;
 		String removeMessage;
 		
 		String[] args = fap.getArgs();
@@ -349,9 +347,7 @@ public class BountiesCE implements CommandExecutor
 			
 			if (bountyHandler.getServerBountyID() > -1)
 			{
-				now = new Date();
-				
-				timeDifference = now.getTime() - bountyHandler.getDate(bountyHandler.getServerBountyID());
+				timeDifference = System.currentTimeMillis() - bountyHandler.getDate(bountyHandler.getServerBountyID());
 				
 				if (timeDifference > csm.getTimeBeforeDrop() || perms.isAdmin())
 				{

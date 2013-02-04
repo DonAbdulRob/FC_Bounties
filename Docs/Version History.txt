@@ -1,5 +1,9 @@
 ~ FC_Bounties Version History ~
 
+Version 3.31:
+
+- Updated for new FC_Suite_Shared.
+
 Version 3.3:
 
 - Updated to CB Beta 1.4.6-R0.3.

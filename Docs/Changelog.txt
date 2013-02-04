@@ -1,0 +1,12 @@
+~ FC_Bounties Changelog ~
+
+-------------------------------------------------------------------
+* Version 3.32:
+-------------------------------------------------------------------
+FC_Suite_Shared Requirement: Version 2.57
+-------------------------------------------------------------------
+General:
+- Updated for new changelog format. 
+- A few internal changes, nothing noticible or significant.
+
+-------------------------------------------------------------------

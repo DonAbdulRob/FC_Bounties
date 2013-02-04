@@ -60,8 +60,6 @@ public class BountyManager
 	
 	public int addNewBounty(String creator, String target, int amount, Location loc)
 	{
-		Date now = new Date();
-		
 		for (int i = 0; i < FC_Bounties.MAX_BOUNTIES; i++)
 		{
 			if (getActive(i) == false)
@@ -71,7 +69,7 @@ public class BountyManager
 				setCreator(i, creator);
 				setTarget(i, target);
 				setAmount(i, amount);
-				setDate(i, now.getTime());
+				setDate(i, System.currentTimeMillis());
 				
 				if (loc == null)
 				{
